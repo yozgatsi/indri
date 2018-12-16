@@ -33,8 +33,4 @@ rmodel/rmodel
 runquery/IndriRunQuery
 
 swig/obj/
-swig/src/java/
-swig/src/go
-swig/src/csharp
-swig/src/php
 

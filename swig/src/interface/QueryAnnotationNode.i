@@ -49,33 +49,6 @@
 }
 #endif
 
-
-#ifdef SWIGGO
-namespace indri{
-
-    namespace api{
-
-        class QueryAnnotationNode {
-            std::string name;
-            std::string type;
-            std::string queryText;
-            std::vector<QueryAnnotationNode*> children;
-        };
-
-%nodefaultctor QueryAnnotation;
-
-        class QueryAnnotation {
-        public:
-            const indri::api::QueryAnnotationNode* getQueryTree() const throw (lemur::api::Exception) ;
-            const indri::infnet::EvaluatorNode::MResults& getAnnotations() const;
-            const std::vector<ScoredExtentResult>& getResults() const;
-            ~QueryAnnotation();
-        };
-    }
-}
-#endif
-
-
 #ifdef SWIGCSHARP
 %typemap(ctype) indri::api::QueryAnnotationNode * "void *"
 %typemap(imtype, out="IntPtr")  indri::api::QueryAnnotationNode * "HandleRef"
@@ -97,18 +70,29 @@ namespace indri {
     };
 #endif
 
-#ifdef SWIGJAVA
+#ifdef SWIGGO
+
+    class QueryAnnotationNode {
+    public:
+        std::string name;
+        std::string type;
+        std::string queryText;
+        std::vector<QueryAnnotationNode*> children;
+    };
+#endif
+
     class QueryAnnotation {
     public:
+#ifdef SWIGJAVA
       %javamethodmodifiers  "
 /**
 @return QueryAnnotationNodes for the query tree.
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
 public";
-    const indri::api::QueryAnnotationNode* getQueryTree() const throw (lemur::api::Exception) ;
 #endif
 
+      const indri::api::QueryAnnotationNode* getQueryTree() const throw (lemur::api::Exception) ;
 #ifdef SWIGJAVA
       %javamethodmodifiers  "
 /**
@@ -120,10 +104,7 @@ public";
       const indri::infnet::EvaluatorNode::MResults& getAnnotations() const throw (lemur::api::Exception) ;
 #endif
 #ifdef SWIGCSHARP
-      class QueryAnnotation {
-      public:
       const std::map< std::string, std::vector<indri::api::ScoredExtentResult> > & getAnnotations() const throw (lemur::api::Exception) ;
-      };
 #endif
 #ifdef SWIGJAVA
       %javamethodmodifiers  "
@@ -132,9 +113,15 @@ public";
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
 public";
-      const std::vector<indri::api::ScoredExtentResult>& getResults() const throw (lemur::api::Exception) ;
-      };
 #endif
 
+#ifdef SWIGGO
+    const indri::api::QueryAnnotationNode* getQueryTree() const throw (lemur::api::Exception) ;
+    const std::map< std::string, std::vector<indri::api::ScoredExtentResult> > & getAnnotations() const throw (lemur::api::Exception) ;
+};
+#endif
+
+      const std::vector<indri::api::ScoredExtentResult>& getResults() const throw (lemur::api::Exception) ;
+    };
   }
 }
