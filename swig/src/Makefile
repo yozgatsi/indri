@@ -58,6 +58,13 @@ CSHARP_CPP=csharp/lemur_csharp.cpp
 INDRI_CSHARPSRC=interface/indri.i
 INDRI_CSHARP_CPP=csharp/indri_csharp.cpp
 
+GOSRC=interface/indri.i
+GOINTERFACES = $(GOSRC) interface/indritypemaps.i
+
+OUTDIRGO=$(OBJ)/go
+GOLIB=$(OUTDIRGO)/libindri_go$(GO_SO)
+GOLIBGO=go/indri_go.go
+
 PHPSRC=interface/indri.i
 PHPINTERFACES = $(PHPSRC) interface/indritypemaps.i
 ## get from configure
@@ -95,6 +102,10 @@ ifeq ($(WITH_SWIG), 1)
     TARGETS += java-lib doc
     DIRS += $(JAVADIRS)
   endif
+  ifeq ($(WITH_GO), 1)
+    TARGETS += go-lib
+    DIRS += $(OUTDIRGO)
+  endif
   ifeq ($(WITH_PHP), 1)
     TARGETS += php-lib
     DIRS += $(OUTDIRPHP)
@@ -104,7 +115,7 @@ ifeq ($(WITH_SWIG), 1)
     DIRS += $(OUTDIRCSHARP)
   endif
 endif
-.PHONY: java-lib php-lib csharp-lib doc
+.PHONY: java-lib go-lib php-lib csharp-lib doc
 
 #all: java-lib php/indri_phpwrap.cpp
 #remove doc from target
@@ -112,6 +123,8 @@ all: $(TARGETS)
 
 
 java-lib: $(JAVADIRS) $(INDRI_PROPS) $(SOLIB) $(JARFILES)
+
+go-lib: $(OUTDIRGO) $(GOLIB)
 
 php-lib: $(OUTDIRPHP) $(PHPLIB)
 
@@ -178,6 +191,26 @@ $(OBJ)/java/IndexUI.jar: $(JAVAOBJ) $(MFSTIND) $(DOCDEP)
 	rm -f $@
 	cd $(OBJ)/java; $(JAR) cmf ../../src/$(MFSTIND) IndexUI.jar lemurproject docs
 
+## GO
+$(GOLIBGO): go/cgo.opt
+go/cgo.opt: ../../Makefile.cgo
+ifneq ("$(SWIG)", "")
+	$(MAKE) -f ../../Makefile.cgo
+endif
+
+go/indri_gowrap.cpp: $(GOINTERFACES) $(GOLIBGO)
+ifneq ("$(SWIG)", "")
+	$(SWIG) -go -cgo -c++ -o go/indri_gowrap.cpp -outdir go $(INCLUDES) -use-shlib -intgosize 64 $(GOSRC) 
+endif
+
+$(OUTDIRGO)/indri_gowrap.o: go/indri_gowrap.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $< $(GOINCLUDE)
+
+$(GOLIB): $(LIBDEPS)
+
+$(GOLIB): $(OUTDIRGO)/indri_gowrap.o 
+	$(CXX) -g $(GO_SHARED) $< -o $@ $(LDFLAGS)
+
 ## PHP
 php/indri_phpwrap.cpp: $(PHPINTERFACES)
 ifneq ("$(SWIG)", "")
@@ -194,7 +227,7 @@ $(PHPLIB): $(OUTDIRPHP)/indri_phpwrap.o
 
 
 clean:
-	rm -rf $(OUTDIRPHP) $(OUTDIRCSHARP) $(OBJ)/java 
+	rm -rf $(OUTDIRGO) $(OUTDIRPHP) $(OUTDIRCSHARP) $(OBJ)/java 
 
 
 install_dirs: $(pkgdatadir) $(pkgdatadir)/JNIdoc $(libdir)
@@ -215,6 +248,10 @@ ifeq ($(WITH_SWIG), 1)
   ifeq ($(WITH_JAVA), 1)
 	$(INSTALL_DATA)  $(JARFILES) $(pkgdatadir)
 	$(INSTALL_PROGRAM) $(SOLIB) $(libdir)
+  endif
+  ifeq ($(WITH_GO), 1)
+	$(INSTALL_PROGRAM) $(GOLIB) $(libdir)
+	$(INSTALL_DATA) $(GOLIBGO) $(pkgdatadir)
   endif
   ifeq ($(WITH_PHP), 1)
 	$(INSTALL_PROGRAM) $(PHPLIB) $(libdir)

@@ -22,7 +22,7 @@
 }
 #endif
 
-%define javaSetEx(method) 
+%define javaSetEx(method)
   %javaexception("java.lang.Exception") method{
   try {
     $action
@@ -45,7 +45,7 @@
 #endif
 #ifdef SWIGPHP5
 // need separate map for individual methods.
-%define setEx(method) 
+%define setEx(method)
   %exception method {
   try {
     $action
@@ -58,10 +58,24 @@
 }
 %enddef
 #endif
+
+#ifdef SWIGGO
+// caller goroutine is responsible to protection against abort.
+%define setEx(method)
+    %exception method {
+        try {
+            $action
+        } catch( lemur::api::Exception& e ) {
+            SWIG_exception( SWIG_RuntimeError, e.what().c_str() );
+        }
+    }
+%enddef
+#endif
+
 #ifdef SWIGCSHARP
 // csharp exception type maps
 %typemap(throws, canthrow=1) lemur::api::Exception
-%{ 
+%{
   SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, ("C++ #$1_type exception: " + $1.what()).c_str());
   return $null; %}
 

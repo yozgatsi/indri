@@ -44,11 +44,11 @@
 
     for( int i=0; i<arrayLength; i++ ) {
       jstring s = (jstring) jenv->GetObjectArrayElement( array, i );
-    
+
       const char* valueBytes = jenv->GetStringUTFChars(s, 0);
       std::string valueString = (const char*) valueBytes;
       jenv->ReleaseStringUTFChars(s, valueBytes);
-    
+
       p.append(key).set(valueString);
     }
   }
@@ -91,16 +91,16 @@
       const char* bytes = jenv->GetStringUTFChars(key, 0);
       std::string keyString = (const char*) bytes;
       jenv->ReleaseStringUTFChars(key, bytes);
-    
+
       // get value object
       jobject value = jenv->CallObjectMethod(entryObject, mapEntryGetValue);
-    
+
       // figure out object type
       if( jenv->IsInstanceOf( value, info.stringClazz ) ) {
         const char* valueBytes = jenv->GetStringUTFChars( (jstring)value, 0);
         std::string valueString = (const char*) valueBytes;
         jenv->ReleaseStringUTFChars( (jstring)value, valueBytes);
-      
+
         p.set( keyString, valueString );
       } else if( jenv->IsInstanceOf( value, info.mapClazz ) ) {
         indri::api::Parameters sub = p.append( keyString );
@@ -120,7 +120,7 @@
 %typemap(in) indri::api::Parameters {
   jni_parameters_info info;
   java_parameters_init( jenv, info );
-  
+
   java_parameters_map( jenv, info, $1, $input );
 }
 
@@ -128,7 +128,7 @@
   if( $input != 0 ) {
     jni_parameters_info info;
     java_parameters_init( jenv, info );
-  
+
     java_parameters_map( jenv, info, p, $input );
     $1 = &p;
   } else {
@@ -140,12 +140,12 @@
   if( $input != 0 ) {
     jni_parameters_info info;
     java_parameters_init( jenv, info );
-  
+
     java_parameters_map( jenv, info, p, $input );
-  }   
+  }
     $1 = &p;
 }
-  
+
 %typemap(javain) indri::api::Parameters "$javainput";
 %typemap(javain) indri::api::Parameters* "$javainput";
 %typemap(javain) indri::api::Parameters& "$javainput";
@@ -155,10 +155,105 @@
 
 #endif
 
+#ifdef SWIGGO
+namespace indri{
+
+    namespace api{
+        class Parameters {
+        public:
+          /// Create
+          Parameters();
+          /// Clean up.
+          ~Parameters();
+          /// Retrieve the entry associated with name.
+          /// @param name the key value.
+          /// @return a Parameters object.
+          // broken when swig wrapped
+//        Parameters get( const std::string& name );
+
+          /// Create a new empty parameter_value for the key given in path
+          /// @param path the key to create the value for
+          /// @return the Parameters object initialized with the new value.
+          // broken when swig wrapped
+//        Parameters append( const std::string& path );
+
+          /// Set the value of the Parameters object
+          /// @param value the value
+          void set( const std::string& value );
+
+          bool get_bool( const std::string& name, bool def );
+          /// Retrieve the entry associated with name.
+          /// @param name the key value.
+          /// @param def the default value for the key
+          /// @return the value associated with the key or def if no entry
+          /// exists.
+          int get_int( const std::string& name, int def );
+          /// Retrieve the entry associated with name.
+          /// @param name the key value.
+          /// @param def the default value for the key
+          /// @return the value associated with the key or def if no entry
+          /// exists.
+          double get_double( const std::string& name, double def );
+          /// Retrieve the entry associated with name.
+          /// @param name the key value.
+          /// @param def the default value for the key
+          /// @return the value associated with the key or def if no entry
+          /// exists.
+          INT64 get_INT64( const std::string& name, INT64 def );
+
+          /// Retrieve the entry associated with name.
+          /// @param name the key value.
+          /// @param def the default value for the key
+          /// @return the value associated with the key or def if no entry
+          /// exists.
+          std::string get_string( const std::string& name, const std::string& def );
+
+          /// Remove an entry from the table. Does nothing if the key does not
+          /// exist.
+          /// @param path the key to remove.
+          void remove( const std::string& path );
+
+          /// Set the value  for the given key.
+          /// @param name the key
+          /// @param value the value
+          void set_bool( const std::string& name, bool value );
+
+          /// Set the value  for the given key.
+          /// @param name the key
+          /// @param value the value
+          void set_string( const std::string& name, const std::string& value );
+          /// Set the value  for the given key.
+          /// @param name the key
+          /// @param value the value
+          void set_int( const std::string& name, int value );
+          /// Set the value  for the given key.
+          /// @param name the key
+          /// @param value the value
+          void set_UINT64( const std::string& name, UINT64 value );
+          /// Set the value  for the given key.
+          /// @param name the key
+          /// @param value the value
+          void set_double( const std::string& name, double value );
+
+          /// Clear the parameter tree
+          void clear();
+
+          /// @return the size of the object.
+          size_t size();
+          /// @param name the key to probe.
+          /// @return true if an entry exists for this key, false otherwise.
+          bool exists( const std::string& name );
+          /// load an XML parameters string.
+          void load( const std::string& text );
+        };
+    }
+}
+#endif
+
 #ifdef SWIGCSHARP
-namespace indri 
+namespace indri
 {
-  namespace api 
+  namespace api
   {
     class Parameters {
     public:

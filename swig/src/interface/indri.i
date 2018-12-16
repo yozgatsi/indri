@@ -1,5 +1,5 @@
 #ifdef SWIGJAVA
-%module (directors="1") indri
+%module (directors="1") indri_go
 #endif
 %{
 #include "indri/indri-platform.h"
@@ -311,7 +311,7 @@ namespace indri{
       void addServer( const std::string& hostname );
       void addIndex( const std::string& pathname );
       void close();
-  
+
       void setMemory( UINT64 memory );
       void setScoringRules( const std::vector<std::string>& rules );
       void setStopwords( const std::vector<std::string>& stopwords );
@@ -358,7 +358,7 @@ namespace indri
 
       // runs original query, expands query based on results ( via expand( .. ) ), then runs expanded query
       std::vector<indri::api::ScoredExtentResult> runExpandedQuery( std::string originalQuery , int resultsRequested , bool verbose = false );
-  
+
       // creates expanded query from an original query and a ranked list of documents
       virtual std::string expand( std::string originalQuery , std::vector<indri::api::ScoredExtentResult>& results ) = 0;
     };
@@ -377,5 +377,75 @@ namespace indri
     };
   }
 }
+
+#endif
+
+#ifdef SWIGGO
+
+%module indri_go
+%insert("go_begin") "go/cgo.opt"
+
+%{
+
+#ifdef INDRI_STANDALONE
+#include "lemur/lemur-compat.hpp"
+#else
+#include "lemur-compat.hpp"
+#endif
+#include "indri/QueryEnvironment.hpp"
+#include "indri/QueryExpander.hpp"
+#include "indri/RMExpander.hpp"
+#include "indri/PonteExpander.hpp"
+#ifdef INDRI_STANDALONE
+#include "lemur/Exception.hpp"
+#else
+#include "Exception.hpp"
+#endif
+
+  // remap overloaded method names.
+  // may want to use %rename here?
+#define onetermCount termCount
+#define onedocumentCount documentCount
+#define runQuerydocset runQuery
+#define runAnnotatedQuerydocset runAnnotatedQuery
+#define documentsdocids documents
+#define documentMetadatadocids documentMetadata
+
+#define set_int set
+#define set_bool set
+#define set_string set
+#define set_UINT64 set
+#define set_double set
+#define get_bool get
+#define get_int get
+#define get_string get
+#define get_INT64 get
+#define get_double get
+
+  %}
+
+%include "typemaps.i"
+%include "std_string.i"
+%include "std_vector.i"
+%include "exception.i"
+%include "indritypemaps.i"
+%include "LemurException.i"
+%include "IntVector.i"
+%include "StringVector.i"
+%include "StringMap.i"
+%include "Specification.i"
+%include "Parameters.i"
+%include "ParsedDocument.i"
+%include "QueryAnnotationNode.i"
+%include "QueryEnvironment.i"
+%include "ScoredExtentArray.i"
+%include "QueryRequest.i"
+%include "QueryResults.i"
+%include "QueryExpander.i"
+%include "MResults.i"
+%include "MetadataPairVector.i"
+%include "DocumentVector.i"
+%include "ConflationPattern.i"
+%include "IndexEnvironment.i"
 
 #endif

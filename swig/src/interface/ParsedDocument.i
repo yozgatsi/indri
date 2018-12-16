@@ -128,7 +128,7 @@
 
 %typemap(in) indri::api::ParsedDocument* ( indri::api::ParsedDocument pdoc, indri::utility::Buffer buf ) %{
   jni_parseddocument_info info;
- 
+
   parseddocument_init( jenv, info );
   $1 = &pdoc;
 
@@ -262,7 +262,7 @@
 %typemap(out) std::vector<indri::api::ParsedDocument*> {
   jni_parseddocument_info info;
   parseddocument_init( jenv, info );
-  
+
   $result = jenv->NewObjectArray($1.size(), info.pdClazz, NULL);
 
   for( unsigned int i=0; i<$1.size(); i++ ) {
@@ -284,6 +284,59 @@
 
 #endif
 
+
+#ifdef SWIGGO
+
+namespace indri{
+
+    namespace parse{
+        struct TermExtent {
+        public:
+        int begin;
+        int end;
+
+        ~TermExtent();
+        };
+    }
+
+    namespace api{
+
+        class ScoredExtentResult {
+            double score;
+            int document;
+            int begin;
+            int end;
+            INT64 number;
+            int ordinal;
+            int parentOrdinal;
+            std::string attributes;
+          public:
+            ~ScoredExtentResult();
+        };
+
+        class ParsedDocument {
+            indri::utility::greedy_vector<char*> terms;
+            indri::utility::greedy_vector<indri::parse::TagExtent> tags;
+            indri::utility::greedy_vector<indri::parse::TermExtent> positions;
+            indri::utility::greedy_vector<indri::parse::MetadataPair> metadata;
+
+
+            const char* text;
+            size_t textLength;
+
+            const char* content;
+            size_t contentLength;
+
+          public:
+            ~ParsedDocument();
+            std::string getContent();
+        };
+    }
+}
+
+#endif
+
+
 #ifdef SWIGCSHARP
 
 %typemap(csdestruct_derived, methodname="Dispose", methodmodifiers="public") std::vector<indri::api::ParsedDocument *>{
@@ -291,7 +344,7 @@
       swigCMemOwn = false;
       for (int i=0; i<Count; i++) {
         indri_csharpPINVOKE.delete_ParsedDocument(ParsedDocument.getCPtr(getitem(i)));
-    }        
+    }
       $imcall;
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
@@ -303,7 +356,7 @@
       swigCMemOwn = false;
       for (int i=0; i<Count; i++) {
         indri_csharpPINVOKE.delete_ParsedDocument(ParsedDocument.getCPtr(getitem(i)));
-    }        
+    }
       $imcall;
     }
     swigCPtr = new HandleRef(null, IntPtr.Zero);
@@ -361,7 +414,7 @@ namespace indri {
       int begin;
       int end;
     };
-    struct TagExtent 
+    struct TagExtent
     {
       const char* name;
       unsigned int begin;
@@ -370,7 +423,7 @@ namespace indri {
       struct indri::parse::TagExtent *parent;
       // explicit initial count of two elements.
       indri::utility::greedy_vector<indri::parse::AttributeValuePair> attributes;
-    };        
+    };
     struct AttributeValuePair {
       char* attribute;
       char* value;
@@ -378,9 +431,9 @@ namespace indri {
       unsigned int end;
     };
   }
-  
+
   namespace api {
-    struct ParsedDocument {  
+    struct ParsedDocument {
       char* text;
       size_t textLength;
 

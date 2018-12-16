@@ -32,9 +32,9 @@
   return $jnicall;
 }
 %typemap(out) std::vector<int>
-{  
+{
   std::vector<int> &input = $1;
-  $result = jenv->NewIntArray(input.size()); 
+  $result = jenv->NewIntArray(input.size());
   jint * body = jenv->GetIntArrayElements($result, 0);
   for( jsize i=0; i<input.size(); i++ ) {
     body[i] = input[i];
@@ -44,6 +44,12 @@
 #endif
 
 #ifdef SWIGCSHARP
+
+%template(IntVector) std::vector<int>;
+
+#endif
+
+#ifdef SWIGGO
 
 %template(IntVector) std::vector<int>;
 

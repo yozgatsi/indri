@@ -60,6 +60,11 @@
 }
 
 #endif
+
+#ifdef SWIGGO
+%template(StringVector) std::vector<std::string>;
+#endif
+
 #ifdef SWIGCSHARP
 %template(StringVector) std::vector<std::string>;
 #endif

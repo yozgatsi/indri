@@ -3,7 +3,7 @@ AC_INIT([Indri],[5.13],[project@lemurproject.org])
 CFLAGS=${CFLAGS:-"-g -O3"}
 CXXFLAGS=${CXXFLAGS:-"-g -O3"}
 AC_CONFIG_SRCDIR(indri-VS2012.sln)
-AC_CONFIG_FILES(MakeDefns Makefile.app)
+AC_CONFIG_FILES(MakeDefns Makefile.app Makefile.cgo)
 AC_CONFIG_FILES([site-search/build.param site-search/crawl-index site-search/seeds.txt site-search/excluded_hosts], [test -f site-search/crawl-index && chmod +x site-search/crawl-index])
 dnl To use a header file instead of command line -D defs, use
 dnl AC_CONFIG_HEADERS(config.h)
@@ -60,7 +60,7 @@ AC_CHECK_LIB(m, log)
 AC_CHECK_LIB(pthread, pthread_create)
 
 case $host in
-   *-*-solaris*) 
+   *-*-solaris*)
      AC_CHECK_LIB(nsl, gethostbyname)
      AC_CHECK_LIB(socket, socket)
      SHARED="-shared -fPIC"
@@ -70,8 +70,10 @@ case $host in
      JAVA_SO=".so"
      CSHARP_SHARED="-G"
      CSHARP_SO=".so"
+     GO_SHARED="-shared -use-shlib"
+     GO_SO=".so"
      ;;
-   *linux*) 
+   *linux*)
      SHARED="-shared -fPIC"
      PHP_SHARED="-shared"
      PHP_SO=".so"
@@ -79,6 +81,8 @@ case $host in
      JAVA_SO=".so"
      CSHARP_SHARED="-shared"
      CSHARP_SO=".so"
+     GO_SHARED="-shared -use-shlib"
+     GO_SO=".so"
      ;;
    *-*-darwin1@<:@3-9@:>@*)
      SHARED=
@@ -90,6 +94,8 @@ case $host in
      JAVA_SO=".jnilib"
      CSHARP_SHARED=" -stdlib=libstdc++ -bundle  -undefined suppress -flat_namespace"
      CSHARP_SO=".so"
+     GO_SHARED=" -stdlib=libstdc++ -bundle  -undefined suppress -flat_namespace -use-shlib"
+     GO_SO=".so"
      CPPFLAGS+=" -stdlib=libstdc++"
      LDFLAGS+=" -stdlib=libstdc++"
      ;;
@@ -101,8 +107,10 @@ case $host in
      PHP_SO=".so"
      JAVA_SHARED="-dynamiclib -framework JavaVM"
      JAVA_SO=".jnilib"
-     CSHARP_SHARED="-bundle  -undefined suppress -flat_namespace"
+     CSHARP_SHARED="-bundle  -undefined suppress -flat_namespace - use-shlib"
      CSHARP_SO=".so"
+     GO_SHARED=" -stdlib=libstdc++ -bundle  -undefined suppress -flat_namespace -use-shlib"
+     GO_SO=".so"
      ;;
    *);;
 esac
@@ -118,9 +126,12 @@ AC_DEFUN([AC_CXX_NAMESPACES],
           AC_LANG_POP
 	  AC_MSG_RESULT($ac_cv_cxx_namespaces)
 	  if test "$ac_cv_cxx_namespaces" = yes; then
-		AC_DEFINE(HAVE_NAMESPACES,,[define if the compiler implements namespaces])
-          fi])
-			      
+    		AC_DEFINE(HAVE_NAMESPACES,1,[define if the compiler implements namespaces])
+    else
+    		AC_DEFINE(HAVE_NAMESPACES,0,[define if the compiler implements namespaces])
+    fi
+   ])
+
 AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_STD],
 	[AC_REQUIRE([AC_CXX_NAMESPACES])
 	AC_MSG_CHECKING([whether isnan is in namespace std])
@@ -131,8 +142,11 @@ AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_STD],
          AC_LANG_POP
  	  AC_MSG_RESULT($ac_cv_cxx_isnan_std)
          if test "$ac_cv_cxx_isnan_std" = yes; then
-	    AC_DEFINE(ISNAN_IN_NAMESPACE_STD,,[define if the compiler has isnan function in namespace std])
-	 fi])
+    	    AC_DEFINE(ISNAN_IN_NAMESPACE_STD,1,[define if the compiler has isnan function in namespace std])
+         else
+    	    AC_DEFINE(ISNAN_IN_NAMESPACE_STD,0,[define if the compiler has isnan function in namespace std])
+         fi
+   ])
 
 AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX],
 	[AC_REQUIRE([AC_CXX_NAMESPACES])
@@ -144,10 +158,13 @@ AC_DEFUN([AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX],
          AC_LANG_POP
  	  AC_MSG_RESULT($ac_cv_cxx_isnan_gnu_cxx)
          if test "$ac_cv_cxx_isnan_gnu_cxx" = yes; then
-	    AC_DEFINE(ISNAN_IN_NAMESPACE_GNU_CXX,,[define if the compiler has isnan function in namespace __gnu_cxx])
-	 fi])
+    	    AC_DEFINE(ISNAN_IN_NAMESPACE_GNU_CXX,1,[define if the compiler has isnan function in namespace __gnu_cxx])
+         else
+    	    AC_DEFINE(ISNAN_IN_NAMESPACE_GNU_CXX,0,[define if the compiler has isnan function in namespace __gnu_cxx])
+         fi
+  ])
 
-AC_CXX_ISNAN_IN_NAMESPACE_STD	       
+AC_CXX_ISNAN_IN_NAMESPACE_STD
 AC_CXX_ISNAN_IN_NAMESPACE_GNU_CXX
 dnl Checks for typedefs, structures, and compiler characteristics.
 dnl AC_CHECK_SIZEOF(int)
@@ -218,6 +235,14 @@ if test "$enable_java" = "yes" ; then
 else
   WITH_JAVA=0
 fi
+AC_ARG_ENABLE(go,
+	    AS_HELP_STRING(--enable-go,Enable go shared library generation))
+if test "$enable_go" = "yes" ; then
+   WITH_SWIG=1
+   WITH_GO=1
+else
+   WITH_GO=0
+fi
 
 AC_ARG_ENABLE(assert,
 	    AS_HELP_STRING(--enable-assert,Enable assert statements in code),
@@ -229,7 +254,7 @@ AC_ARG_ENABLE(assert,
 dnl Look for java
 if test "$enable_java" = "yes" ; then
    AC_ARG_WITH(javahome, [  --with-javahome=path       Set location of JAVAHOME],[JAVAHOME="$withval"; JAVACBIN=$JAVAHOME/bin/javac; JAVAINCDIR=$JAVAHOME/include; JAR=$JAVAHOME/bin/jar; JAVADOC=$JAVAHOME/bin/javadoc], [JAVAHOME=])
-   
+
    if test -z "$JAVACBIN" ; then
      AC_PATH_PROGS(JAVAC, javac)
      AC_PATH_PROGS(JAR, jar)
@@ -319,6 +344,26 @@ if test "$enable_csharp" = yes ; then
   fi
 fi
 
+dnl Look for go
+if test "$enable_go" = "yes" ; then
+   AC_MSG_CHECKING(for go root folder)
+   AC_ARG_WITH(goroot, [  --with-goroot=path       Set location of GOROOT],[GOROOT="$withval"; GOBIN=$GOROOT/bin/go ], [GOROOT=])
+
+   if test -z "$GOBIN" ; then
+     AC_PATH_PROGS(GOBIN, go)
+   else
+     GO="$GOBIN"
+   fi
+   WITH_GO=1
+else
+   GOBIN=
+   GOROOT=
+   WITH_GO=0
+fi
+AC_SUBST(GOBIN)
+AC_SUBST(GOROOT)
+AC_SUBST(WITH_GO)
+
 dnl Look for swig
 SWIG=
 if test $WITH_SWIG = 1 ; then
@@ -344,10 +389,11 @@ AC_SUBST(WITH_SWIG)
 AC_SUBST(PHP_SHARED)
 AC_SUBST(JAVA_SHARED)
 AC_SUBST(CSHARP_SHARED)
+AC_SUBST(GO_SHARED)
 AC_SUBST(PHP_SO)
 AC_SUBST(JAVA_SO)
 AC_SUBST(CSHARP_SO)
-AC_SUBST(CSHARP_SO)
+AC_SUBST(GO_SO)
 
 dnl site search parameters
 SITESEED="unknownhost"
