@@ -29,7 +29,7 @@ public class QueryAnnotation {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        indriJNI.delete_QueryAnnotation(swigCPtr);
+        indri_goJNI.delete_QueryAnnotation(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -41,7 +41,7 @@ public class QueryAnnotation {
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
 public QueryAnnotationNode getQueryTree() throws java.lang.Exception {
-  return indriJNI.QueryAnnotation_getQueryTree(swigCPtr, this);
+  return indri_goJNI.QueryAnnotation_getQueryTree(swigCPtr, this);
 }
 
   
@@ -50,7 +50,7 @@ public QueryAnnotationNode getQueryTree() throws java.lang.Exception {
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
 public java.util.Map getAnnotations() throws java.lang.Exception {
-  return indriJNI.QueryAnnotation_getAnnotations(swigCPtr, this);
+  return indri_goJNI.QueryAnnotation_getAnnotations(swigCPtr, this);
 }
 
   
@@ -59,7 +59,7 @@ public java.util.Map getAnnotations() throws java.lang.Exception {
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
 public ScoredExtentResult[] getResults() throws java.lang.Exception {
-  return indriJNI.QueryAnnotation_getResults(swigCPtr, this);
+  return indri_goJNI.QueryAnnotation_getResults(swigCPtr, this);
 }
 
   
@@ -68,7 +68,7 @@ public ScoredExtentResult[] getResults() throws java.lang.Exception {
 @throws Exception if a lemur::api::Exception was thrown by the JNI library.
 */
 public QueryAnnotation() {
-    this(indriJNI.new_QueryAnnotation(), true);
+    this(indri_goJNI.new_QueryAnnotation(), true);
   }
 
 }

@@ -29,7 +29,7 @@ public class IndexStatus {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        indriJNI.delete_IndexStatus(swigCPtr);
+        indri_goJNI.delete_IndexStatus(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -42,21 +42,21 @@ public class IndexStatus {
 
   public void swigReleaseOwnership() {
     swigCMemOwn = false;
-    indriJNI.IndexStatus_change_ownership(this, swigCPtr, false);
+    indri_goJNI.IndexStatus_change_ownership(this, swigCPtr, false);
   }
 
   public void swigTakeOwnership() {
     swigCMemOwn = true;
-    indriJNI.IndexStatus_change_ownership(this, swigCPtr, true);
+    indri_goJNI.IndexStatus_change_ownership(this, swigCPtr, true);
   }
 
   public void status(int code, String documentPath, String error, int documentsIndexed, int documentsSeen) {
-    indriJNI.IndexStatus_status(swigCPtr, this, code, documentPath, error, documentsIndexed, documentsSeen);
+    indri_goJNI.IndexStatus_status(swigCPtr, this, code, documentPath, error, documentsIndexed, documentsSeen);
   }
 
   public IndexStatus() {
-    this(indriJNI.new_IndexStatus(), true);
-    indriJNI.IndexStatus_director_connect(this, swigCPtr, swigCMemOwn, true);
+    this(indri_goJNI.new_IndexStatus(), true);
+    indri_goJNI.IndexStatus_director_connect(this, swigCPtr, swigCMemOwn, true);
   }
 
   public final static class action_code {

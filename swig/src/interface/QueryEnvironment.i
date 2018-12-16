@@ -9,13 +9,13 @@ namespace indri {
 
 #ifdef SWIGGO
     setEx(QueryEnvironment::addServer);
-    setEx(QueryEnvironment::addIndex();
-    setEx(QueryEnvironment::removeServer();
-    setEx(QueryEnvironment::removeIndex();
-    setEx(QueryEnvironment::close();
-    setEx(QueryEnvironment::setMemory();
-    setEx(QueryEnvironment::setScoringRules();
-    setEx(QueryEnvironment::setStopwords();
+    setEx(QueryEnvironment::addIndex);
+    setEx(QueryEnvironment::removeServer);
+    setEx(QueryEnvironment::removeIndex);
+    setEx(QueryEnvironment::close);
+    setEx(QueryEnvironment::setMemory);
+    setEx(QueryEnvironment::setScoringRules);
+    setEx(QueryEnvironment::setStopwords);
     setEx(QueryEnvironment::runQuery);
     setEx(QueryEnvironment::runAnnotatedQuery);
     setEx(QueryEnvironment::runQuerydocset);

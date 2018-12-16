@@ -12,7 +12,7 @@ public class PonteExpander extends QueryExpander {
   private transient long swigCPtr;
 
   protected PonteExpander(long cPtr, boolean cMemoryOwn) {
-    super(indriJNI.PonteExpander_SWIGUpcast(cPtr), cMemoryOwn);
+    super(indri_goJNI.PonteExpander_SWIGUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
 
@@ -28,7 +28,7 @@ public class PonteExpander extends QueryExpander {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        indriJNI.delete_PonteExpander(swigCPtr);
+        indri_goJNI.delete_PonteExpander(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -36,11 +36,11 @@ public class PonteExpander extends QueryExpander {
   }
 
   public PonteExpander(QueryEnvironment env, Map param) {
-    this(indriJNI.new_PonteExpander(QueryEnvironment.getCPtr(env), env, param), true);
+    this(indri_goJNI.new_PonteExpander(QueryEnvironment.getCPtr(env), env, param), true);
   }
 
   public String expand(String originalQuery, ScoredExtentResult[] results) {
-    return indriJNI.PonteExpander_expand(swigCPtr, this, originalQuery, results);
+    return indri_goJNI.PonteExpander_expand(swigCPtr, this, originalQuery, results);
   }
 
 }

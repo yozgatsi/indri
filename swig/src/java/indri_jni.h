@@ -8,8 +8,8 @@
  * interface file instead.
  * ----------------------------------------------------------------------------- */
 
-#ifndef SWIG_indri_WRAP_H_
-#define SWIG_indri_WRAP_H_
+#ifndef SWIG_indri_go_WRAP_H_
+#define SWIG_indri_go_WRAP_H_
 
 struct SwigDirector_IndexStatus : public indri::api::IndexStatus, public Swig::Director {
 

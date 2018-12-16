@@ -116,9 +116,7 @@ public";
 #endif
 
 #ifdef SWIGGO
-    const indri::api::QueryAnnotationNode* getQueryTree() const throw (lemur::api::Exception) ;
     const std::map< std::string, std::vector<indri::api::ScoredExtentResult> > & getAnnotations() const throw (lemur::api::Exception) ;
-};
 #endif
 
       const std::vector<indri::api::ScoredExtentResult>& getResults() const throw (lemur::api::Exception) ;

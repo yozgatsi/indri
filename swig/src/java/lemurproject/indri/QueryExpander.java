@@ -29,22 +29,22 @@ public class QueryExpander {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        indriJNI.delete_QueryExpander(swigCPtr);
+        indri_goJNI.delete_QueryExpander(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public ScoredExtentResult[] runExpandedQuery(String originalQuery, int resultsRequested, boolean verbose) {
-  return indriJNI.QueryExpander_runExpandedQuery__SWIG_0(swigCPtr, this, originalQuery, resultsRequested, verbose);
+  return indri_goJNI.QueryExpander_runExpandedQuery__SWIG_0(swigCPtr, this, originalQuery, resultsRequested, verbose);
 }
 
   public ScoredExtentResult[] runExpandedQuery(String originalQuery, int resultsRequested) {
-  return indriJNI.QueryExpander_runExpandedQuery__SWIG_1(swigCPtr, this, originalQuery, resultsRequested);
+  return indri_goJNI.QueryExpander_runExpandedQuery__SWIG_1(swigCPtr, this, originalQuery, resultsRequested);
 }
 
   public String expand(String originalQuery, ScoredExtentResult[] results) {
-    return indriJNI.QueryExpander_expand(swigCPtr, this, originalQuery, results);
+    return indri_goJNI.QueryExpander_expand(swigCPtr, this, originalQuery, results);
   }
 
 }

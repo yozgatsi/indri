@@ -12,7 +12,7 @@ public class RMExpander extends QueryExpander {
   private transient long swigCPtr;
 
   protected RMExpander(long cPtr, boolean cMemoryOwn) {
-    super(indriJNI.RMExpander_SWIGUpcast(cPtr), cMemoryOwn);
+    super(indri_goJNI.RMExpander_SWIGUpcast(cPtr), cMemoryOwn);
     swigCPtr = cPtr;
   }
 
@@ -28,7 +28,7 @@ public class RMExpander extends QueryExpander {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        indriJNI.delete_RMExpander(swigCPtr);
+        indri_goJNI.delete_RMExpander(swigCPtr);
       }
       swigCPtr = 0;
     }
@@ -36,11 +36,11 @@ public class RMExpander extends QueryExpander {
   }
 
   public RMExpander(QueryEnvironment env, Map param) {
-    this(indriJNI.new_RMExpander(QueryEnvironment.getCPtr(env), env, param), true);
+    this(indri_goJNI.new_RMExpander(QueryEnvironment.getCPtr(env), env, param), true);
   }
 
   public String expand(String originalQuery, ScoredExtentResult[] results) {
-    return indriJNI.RMExpander_expand(swigCPtr, this, originalQuery, results);
+    return indri_goJNI.RMExpander_expand(swigCPtr, this, originalQuery, results);
   }
 
 }

@@ -677,7 +677,7 @@ namespace Swig {
 
 namespace Swig {
   namespace {
-    jclass jclass_indriJNI = NULL;
+    jclass jclass_indri_goJNI = NULL;
     jmethodID director_method_ids[1];
   }
 }
@@ -946,11 +946,11 @@ SWIGINTERN void SWIG_JavaException(JNIEnv *jenv, int code, const char *msg) {
 
     for( int i=0; i<arrayLength; i++ ) {
       jstring s = (jstring) jenv->GetObjectArrayElement( array, i );
-    
+
       const char* valueBytes = jenv->GetStringUTFChars(s, 0);
       std::string valueString = (const char*) valueBytes;
       jenv->ReleaseStringUTFChars(s, valueBytes);
-    
+
       p.append(key).set(valueString);
     }
   }
@@ -993,16 +993,16 @@ SWIGINTERN void SWIG_JavaException(JNIEnv *jenv, int code, const char *msg) {
       const char* bytes = jenv->GetStringUTFChars(key, 0);
       std::string keyString = (const char*) bytes;
       jenv->ReleaseStringUTFChars(key, bytes);
-    
+
       // get value object
       jobject value = jenv->CallObjectMethod(entryObject, mapEntryGetValue);
-    
+
       // figure out object type
       if( jenv->IsInstanceOf( value, info.stringClazz ) ) {
         const char* valueBytes = jenv->GetStringUTFChars( (jstring)value, 0);
         std::string valueString = (const char*) valueBytes;
         jenv->ReleaseStringUTFChars( (jstring)value, valueBytes);
-      
+
         p.set( keyString, valueString );
       } else if( jenv->IsInstanceOf( value, info.mapClazz ) ) {
         indri::api::Parameters sub = p.append( keyString );
@@ -1423,7 +1423,7 @@ void SwigDirector_IndexStatus::status(int code, std::string const &documentPath,
     Swig::LocalRefGuard error_refguard(jenv, jerror); 
     jdocumentsIndexed = (jint) documentsIndexed;
     jdocumentsSeen = (jint) documentsSeen;
-    jenv->CallStaticVoidMethod(Swig::jclass_indriJNI, Swig::director_method_ids[0], swigjobj, jcode, jdocumentPath, jerror, jdocumentsIndexed, jdocumentsSeen);
+    jenv->CallStaticVoidMethod(Swig::jclass_indri_goJNI, Swig::director_method_ids[0], swigjobj, jcode, jdocumentPath, jerror, jdocumentsIndexed, jdocumentsSeen);
     jthrowable swigerror = jenv->ExceptionOccurred();
     if (swigerror) {
       jenv->ExceptionClear();
@@ -1477,7 +1477,7 @@ void SwigDirector_IndexStatus::swig_connect_director(JNIEnv *jenv, jobject jself
 extern "C" {
 #endif
 
-SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indriJNI_QueryAnnotation_1getQueryTree(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indri_1goJNI_QueryAnnotation_1getQueryTree(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jobject jresult = 0 ;
   indri::api::QueryAnnotation *arg1 = (indri::api::QueryAnnotation *) 0 ;
   indri::api::QueryAnnotationNode *result = 0 ;
@@ -1522,7 +1522,7 @@ SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indriJNI_QueryAnnotation_1get
 }
 
 
-SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indriJNI_QueryAnnotation_1getAnnotations(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indri_1goJNI_QueryAnnotation_1getAnnotations(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jobject jresult = 0 ;
   indri::api::QueryAnnotation *arg1 = (indri::api::QueryAnnotation *) 0 ;
   indri::infnet::EvaluatorNode::MResults *result = 0 ;
@@ -1607,7 +1607,7 @@ SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indriJNI_QueryAnnotation_1get
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryAnnotation_1getResults(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryAnnotation_1getResults(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jobjectArray jresult = 0 ;
   indri::api::QueryAnnotation *arg1 = (indri::api::QueryAnnotation *) 0 ;
   std::vector< indri::api::ScoredExtentResult > *result = 0 ;
@@ -1645,7 +1645,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryAnnotation
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1QueryAnnotation(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_new_1QueryAnnotation(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   indri::api::QueryAnnotation *result = 0 ;
   
@@ -1667,7 +1667,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1QueryAnnotation(J
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1QueryAnnotation(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_delete_1QueryAnnotation(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   indri::api::QueryAnnotation *arg1 = (indri::api::QueryAnnotation *) 0 ;
   
   (void)jenv;
@@ -1687,7 +1687,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1QueryAnnotation
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1QueryEnvironment(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_new_1QueryEnvironment(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *result = 0 ;
   
@@ -1709,7 +1709,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1QueryEnvironment(
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1addServer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1addServer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -1751,7 +1751,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1addSe
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1addIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1addIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -1793,7 +1793,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1addIn
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1removeServer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1removeServer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -1835,7 +1835,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1remov
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1removeIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1removeIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -1877,7 +1877,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1remov
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1close(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1close(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   
   (void)jenv;
@@ -1909,7 +1909,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1close
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1setMemory(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1setMemory(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   UINT64 arg2 ;
   
@@ -1943,7 +1943,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1setMe
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1setScoringRules(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1setScoringRules(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2) {
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::vector< std::string > *arg2 = 0 ;
   std::vector< std::string > strin2 ;
@@ -1990,7 +1990,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1setSc
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1setStopwords(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1setStopwords(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2) {
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::vector< std::string > *arg2 = 0 ;
   std::vector< std::string > strin2 ;
@@ -2037,7 +2037,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1setSt
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1runQuery_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1runQuery_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3) {
   jobjectArray jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -2087,7 +2087,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1runQuery_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jintArray jarg3, jint jarg4) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1runQuery_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jintArray jarg3, jint jarg4) {
   jobjectArray jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -2150,7 +2150,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
 }
 
 
-SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1runQuery_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
+SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1runQuery_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jobject jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   indri::api::QueryRequest *arg2 = 0 ;
@@ -2234,7 +2234,7 @@ SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1ru
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1runAnnotatedQuery_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1runAnnotatedQuery_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -2282,7 +2282,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1runA
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1runAnnotatedQuery_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jintArray jarg3, jint jarg4) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1runAnnotatedQuery_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jintArray jarg3, jint jarg4) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -2343,7 +2343,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1runA
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documents_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documents_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
   jobjectArray jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::vector< int > *arg2 = 0 ;
@@ -2403,7 +2403,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documents_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documents_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2) {
   jobjectArray jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::vector< indri::api::ScoredExtentResult > *arg2 = 0 ;
@@ -2480,7 +2480,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documentMetadata_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2, jstring jarg3) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documentMetadata_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2, jstring jarg3) {
   jobjectArray jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::vector< int > *arg2 = 0 ;
@@ -2548,7 +2548,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documentMetadata_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2, jstring jarg3) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documentMetadata_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2, jstring jarg3) {
   jobjectArray jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::vector< indri::api::ScoredExtentResult > *arg2 = 0 ;
@@ -2633,7 +2633,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
 }
 
 
-SWIGEXPORT jintArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documentIDsFromMetadata(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobjectArray jarg3) {
+SWIGEXPORT jintArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documentIDsFromMetadata(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobjectArray jarg3) {
   jintArray jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -2702,7 +2702,7 @@ SWIGEXPORT jintArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documentsFromMetadata(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobjectArray jarg3) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documentsFromMetadata(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobjectArray jarg3) {
   jobjectArray jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -2774,7 +2774,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1termCount_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1termCount_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   INT64 result;
@@ -2810,7 +2810,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1term
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1termCount_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1termCount_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -2856,7 +2856,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1term
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1termFieldCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1termFieldCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -2912,7 +2912,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1term
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1fieldList(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1fieldList(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jobjectArray jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   SwigValueWrapper< std::vector< std::string > > result;
@@ -2957,7 +2957,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documentCount_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documentCount_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   INT64 result;
@@ -2993,7 +2993,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1docu
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documentCount_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documentCount_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -3039,7 +3039,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1docu
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documentVectors(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documentVectors(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
   jobjectArray jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::vector< int > *arg2 = 0 ;
@@ -3097,7 +3097,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1expressionCount_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+SWIGEXPORT jdouble JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1expressionCount_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
   jdouble jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -3153,7 +3153,7 @@ SWIGEXPORT jdouble JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1ex
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1expressionCount_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jdouble JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1expressionCount_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jdouble jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -3199,7 +3199,7 @@ SWIGEXPORT jdouble JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1ex
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documentExpressionCount_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+SWIGEXPORT jdouble JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documentExpressionCount_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
   jdouble jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -3255,7 +3255,7 @@ SWIGEXPORT jdouble JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1do
 }
 
 
-SWIGEXPORT jdouble JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documentExpressionCount_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jdouble JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documentExpressionCount_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jdouble jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -3301,7 +3301,7 @@ SWIGEXPORT jdouble JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1do
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1expressionList_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1expressionList_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
   jobjectArray jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -3359,7 +3359,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1expressionList_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1expressionList_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jobjectArray jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -3407,7 +3407,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironmen
 }
 
 
-SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documentLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT jint JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documentLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   jint jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   int arg2 ;
@@ -3445,7 +3445,7 @@ SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1docum
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1setFormulationParameters(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1setFormulationParameters(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   indri::api::Parameters *arg2 = 0 ;
   indri::api::Parameters p2 ;
@@ -3460,7 +3460,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1setFo
       java_parameters_init( jenv, info );
       
       java_parameters_map( jenv, info, p2, jarg2 );
-    }   
+    }
     arg2 = &p2;
   }
   {
@@ -3477,7 +3477,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1setFo
 }
 
 
-SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1reformulateQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1reformulateQuery(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jstring jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -3512,7 +3512,7 @@ SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1re
 }
 
 
-SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1stemTerm(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1stemTerm(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jstring jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -3547,7 +3547,7 @@ SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1st
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1termCountUnique(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1termCountUnique(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   INT64 result;
@@ -3572,7 +3572,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1term
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1stemCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1stemCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -3607,7 +3607,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1stem
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1stemFieldCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1stemFieldCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -3652,7 +3652,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1stem
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1documentStemCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_QueryEnvironment_1documentStemCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -3687,7 +3687,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_QueryEnvironment_1docu
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1QueryEnvironment(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_delete_1QueryEnvironment(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   
   (void)jenv;
@@ -3707,7 +3707,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1QueryEnvironmen
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1QueryExpander(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_delete_1QueryExpander(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
   
   (void)jenv;
@@ -3727,7 +3727,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1QueryExpander(J
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryExpander_1runExpandedQuery_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3, jboolean jarg4) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryExpander_1runExpandedQuery_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3, jboolean jarg4) {
   jobjectArray jresult = 0 ;
   indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
   std::string arg2 ;
@@ -3767,7 +3767,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryExpander_1
 }
 
 
-SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryExpander_1runExpandedQuery_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3) {
+SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indri_1goJNI_QueryExpander_1runExpandedQuery_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jint jarg3) {
   jobjectArray jresult = 0 ;
   indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
   std::string arg2 ;
@@ -3805,7 +3805,7 @@ SWIGEXPORT jobjectArray JNICALL Java_lemurproject_indri_indriJNI_QueryExpander_1
 }
 
 
-SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_QueryExpander_1expand(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobjectArray jarg3) {
+SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indri_1goJNI_QueryExpander_1expand(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobjectArray jarg3) {
   jstring jresult = 0 ;
   indri::query::QueryExpander *arg1 = (indri::query::QueryExpander *) 0 ;
   std::string arg2 ;
@@ -3869,7 +3869,7 @@ SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_QueryExpander_1expan
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1RMExpander(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_new_1RMExpander(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   indri::api::Parameters *arg2 = 0 ;
@@ -3886,7 +3886,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1RMExpander(JNIEnv
       java_parameters_init( jenv, info );
       
       java_parameters_map( jenv, info, p2, jarg2 );
-    }   
+    }
     arg2 = &p2;
   }
   {
@@ -3905,7 +3905,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1RMExpander(JNIEnv
 }
 
 
-SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_RMExpander_1expand(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobjectArray jarg3) {
+SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indri_1goJNI_RMExpander_1expand(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobjectArray jarg3) {
   jstring jresult = 0 ;
   indri::query::RMExpander *arg1 = (indri::query::RMExpander *) 0 ;
   std::string arg2 ;
@@ -3969,7 +3969,7 @@ SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_RMExpander_1expand(J
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1RMExpander(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_delete_1RMExpander(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   indri::query::RMExpander *arg1 = (indri::query::RMExpander *) 0 ;
   
   (void)jenv;
@@ -3989,7 +3989,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1RMExpander(JNIE
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1PonteExpander(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_new_1PonteExpander(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jlong jresult = 0 ;
   indri::api::QueryEnvironment *arg1 = (indri::api::QueryEnvironment *) 0 ;
   indri::api::Parameters *arg2 = 0 ;
@@ -4006,7 +4006,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1PonteExpander(JNI
       java_parameters_init( jenv, info );
       
       java_parameters_map( jenv, info, p2, jarg2 );
-    }   
+    }
     arg2 = &p2;
   }
   {
@@ -4025,7 +4025,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1PonteExpander(JNI
 }
 
 
-SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_PonteExpander_1expand(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobjectArray jarg3) {
+SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indri_1goJNI_PonteExpander_1expand(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jobjectArray jarg3) {
   jstring jresult = 0 ;
   indri::query::PonteExpander *arg1 = (indri::query::PonteExpander *) 0 ;
   std::string arg2 ;
@@ -4089,7 +4089,7 @@ SWIGEXPORT jstring JNICALL Java_lemurproject_indri_indriJNI_PonteExpander_1expan
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1PonteExpander(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_delete_1PonteExpander(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   indri::query::PonteExpander *arg1 = (indri::query::PonteExpander *) 0 ;
   
   (void)jenv;
@@ -4109,7 +4109,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1PonteExpander(J
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1IndexStatus(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_delete_1IndexStatus(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   indri::api::IndexStatus *arg1 = (indri::api::IndexStatus *) 0 ;
   
   (void)jenv;
@@ -4129,7 +4129,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1IndexStatus(JNI
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexStatus_1status(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jstring jarg3, jstring jarg4, jint jarg5, jint jarg6) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexStatus_1status(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jstring jarg3, jstring jarg4, jint jarg5, jint jarg6) {
   indri::api::IndexStatus *arg1 = (indri::api::IndexStatus *) 0 ;
   int arg2 ;
   std::string *arg3 = 0 ;
@@ -4176,7 +4176,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexStatus_1status(JNI
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1IndexStatus(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_new_1IndexStatus(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   indri::api::IndexStatus *result = 0 ;
   
@@ -4198,7 +4198,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1IndexStatus(JNIEn
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexStatus_1director_1connect(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jswig_mem_own, jboolean jweak_global) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexStatus_1director_1connect(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jswig_mem_own, jboolean jweak_global) {
   indri::api::IndexStatus *obj = *((indri::api::IndexStatus **)&objarg);
   (void)jcls;
   SwigDirector_IndexStatus *director = dynamic_cast<SwigDirector_IndexStatus *>(obj);
@@ -4208,7 +4208,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexStatus_1director_1
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexStatus_1change_1ownership(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jtake_or_release) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexStatus_1change_1ownership(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jtake_or_release) {
   indri::api::IndexStatus *obj = *((indri::api::IndexStatus **)&objarg);
   SwigDirector_IndexStatus *director = dynamic_cast<SwigDirector_IndexStatus *>(obj);
   (void)jcls;
@@ -4218,7 +4218,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexStatus_1change_1ow
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1IndexEnvironment(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_new_1IndexEnvironment(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   indri::api::IndexEnvironment *result = 0 ;
   
@@ -4240,7 +4240,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_new_1IndexEnvironment(
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1IndexEnvironment(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_delete_1IndexEnvironment(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   
   (void)jenv;
@@ -4260,7 +4260,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_delete_1IndexEnvironmen
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setDocumentRoot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setDocumentRoot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -4302,7 +4302,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setDo
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setAnchorTextPath(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setAnchorTextPath(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -4344,7 +4344,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setAn
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setOffsetMetadataPath(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setOffsetMetadataPath(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -4386,7 +4386,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setOf
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setOffsetAnnotationsPath(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setOffsetAnnotationsPath(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -4428,7 +4428,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setOf
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFileClass_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jstring jarg5, jstring jarg6, jstring jarg7, jstring jarg8, jobjectArray jarg9, jobjectArray jarg10, jobjectArray jarg11, jobjectArray jarg12, jobjectArray jarg13) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1addFileClass_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jstring jarg4, jstring jarg5, jstring jarg6, jstring jarg7, jstring jarg8, jobjectArray jarg9, jobjectArray jarg10, jobjectArray jarg11, jobjectArray jarg12, jobjectArray jarg13) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -4650,7 +4650,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFi
 }
 
 
-SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1getFileClassSpec(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1getFileClassSpec(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jobject jresult = 0 ;
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -4703,7 +4703,7 @@ SWIGEXPORT jobject JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1ge
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFileClass_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1addFileClass_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   indri::parse::FileClassEnvironmentFactory::Specification *arg2 = 0 ;
   indri::parse::FileClassEnvironmentFactory::Specification spec2 ;
@@ -4785,7 +4785,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFi
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1deleteDocument(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1deleteDocument(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   int arg2 ;
   
@@ -4819,7 +4819,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1delet
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setIndexedFields(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setIndexedFields(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::vector< std::string > *arg2 = 0 ;
   std::vector< std::string > strin2 ;
@@ -4866,7 +4866,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setIn
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setNumericField_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3, jstring jarg4) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setNumericField_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3, jstring jarg4) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   bool arg3 ;
@@ -4920,7 +4920,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setNu
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setNumericField_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setNumericField_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   bool arg3 ;
@@ -4964,7 +4964,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setNu
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setOrdinalField(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setOrdinalField(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   bool arg3 ;
@@ -5008,7 +5008,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setOr
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setParentalField(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setParentalField(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jboolean jarg3) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   bool arg3 ;
@@ -5052,7 +5052,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setPa
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setMetadataIndexedFields(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2, jobjectArray jarg3) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setMetadataIndexedFields(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2, jobjectArray jarg3) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::vector< std::string > *arg2 = 0 ;
   std::vector< std::string > *arg3 = 0 ;
@@ -5114,7 +5114,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setMe
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setStopwords(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setStopwords(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobjectArray jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::vector< std::string > *arg2 = 0 ;
   std::vector< std::string > strin2 ;
@@ -5161,7 +5161,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setSt
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setStemmer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setStemmer(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -5203,7 +5203,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setSt
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setMemory(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setMemory(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   UINT64 arg2 ;
   
@@ -5237,7 +5237,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setMe
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setNormalization(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setNormalization(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   bool arg2 ;
   
@@ -5271,7 +5271,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setNo
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setStoreDocs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1setStoreDocs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   bool arg2 ;
   
@@ -5305,7 +5305,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1setSt
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1create_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1create_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3, jobject jarg3_) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   indri::api::IndexStatus *arg3 = (indri::api::IndexStatus *) 0 ;
@@ -5350,7 +5350,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1creat
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1create_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1create_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -5392,7 +5392,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1creat
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1open_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3, jobject jarg3_) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1open_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3, jobject jarg3_) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   indri::api::IndexStatus *arg3 = (indri::api::IndexStatus *) 0 ;
@@ -5437,7 +5437,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1open_
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1open_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1open_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -5479,7 +5479,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1open_
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1close(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1close(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   
   (void)jenv;
@@ -5511,7 +5511,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1close
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFile_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1addFile_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   
@@ -5553,7 +5553,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFi
 }
 
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFile_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1addFile_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3) {
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
   std::string *arg3 = 0 ;
@@ -5605,7 +5605,7 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addFi
 }
 
 
-SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addString_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jobjectArray jarg4) {
+SWIGEXPORT jint JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1addString_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jobjectArray jarg4) {
   jint jresult = 0 ;
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -5742,7 +5742,7 @@ SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addSt
 }
 
 
-SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addString_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jobjectArray jarg4, jobjectArray jarg5) {
+SWIGEXPORT jint JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1addString_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jstring jarg3, jobjectArray jarg4, jobjectArray jarg5) {
   jint jresult = 0 ;
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   std::string *arg2 = 0 ;
@@ -5946,7 +5946,7 @@ SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addSt
 }
 
 
-SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addParsedDocument(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
+SWIGEXPORT jint JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1addParsedDocument(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jobject jarg2) {
   jint jresult = 0 ;
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   indri::api::ParsedDocument *arg2 = (indri::api::ParsedDocument *) 0 ;
@@ -6109,7 +6109,7 @@ SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1addPa
 }
 
 
-SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1documentsIndexed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1documentsIndexed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   int result;
@@ -6145,7 +6145,7 @@ SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1docum
 }
 
 
-SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1documentsSeen(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jint JNICALL Java_lemurproject_indri_indri_1goJNI_IndexEnvironment_1documentsSeen(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   jint jresult = 0 ;
   indri::api::IndexEnvironment *arg1 = (indri::api::IndexEnvironment *) 0 ;
   int result;
@@ -6181,7 +6181,7 @@ SWIGEXPORT jint JNICALL Java_lemurproject_indri_indriJNI_IndexEnvironment_1docum
 }
 
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_RMExpander_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_RMExpander_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
@@ -6189,7 +6189,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_RMExpander_1SWIGUpcast
     return baseptr;
 }
 
-SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_PonteExpander_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indri_1goJNI_PonteExpander_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
     jlong baseptr = 0;
     (void)jenv;
     (void)jcls;
@@ -6197,7 +6197,7 @@ SWIGEXPORT jlong JNICALL Java_lemurproject_indri_indriJNI_PonteExpander_1SWIGUpc
     return baseptr;
 }
 
-SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_swig_1module_1init(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT void JNICALL Java_lemurproject_indri_indri_1goJNI_swig_1module_1init(JNIEnv *jenv, jclass jcls) {
   int i;
   
   static struct {
@@ -6208,8 +6208,8 @@ SWIGEXPORT void JNICALL Java_lemurproject_indri_indriJNI_swig_1module_1init(JNIE
       "SwigDirector_IndexStatus_status", "(Llemurproject/indri/IndexStatus;ILjava/lang/String;Ljava/lang/String;II)V" 
     }
   };
-  Swig::jclass_indriJNI = (jclass) jenv->NewGlobalRef(jcls);
-  if (!Swig::jclass_indriJNI) return;
+  Swig::jclass_indri_goJNI = (jclass) jenv->NewGlobalRef(jcls);
+  if (!Swig::jclass_indri_goJNI) return;
   for (i = 0; i < (int) (sizeof(methods)/sizeof(methods[0])); ++i) {
     Swig::director_method_ids[i] = jenv->GetStaticMethodID(jcls, methods[i].method, methods[i].signature);
     if (!Swig::director_method_ids[i]) return;
