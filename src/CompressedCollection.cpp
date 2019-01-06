@@ -38,6 +38,7 @@ const char TEXT_KEY[] = "#TEXT#";
 const char CONTENT_KEY[] = "#CONTENT#";
 const char CONTENTLENGTH_KEY[] = "#CONTENTLENGTH#";
 
+
 //
 // zlib_alloc
 //
@@ -63,7 +64,7 @@ static void zlib_deflate( z_stream_s& stream, indri::file::SequentialWriteBuffer
     // nothing to do...
     return;
   }
-  
+
   if( stream.avail_out == 0 ) {
     stream.next_out = (Bytef*) outfile->write( OUTPUT_BUFFER_SIZE );
     stream.avail_out = OUTPUT_BUFFER_SIZE;
@@ -81,7 +82,7 @@ static void zlib_deflate( z_stream_s& stream, indri::file::SequentialWriteBuffer
     // get more space
     stream.next_out = (Bytef*) outfile->write( OUTPUT_BUFFER_SIZE );
     stream.avail_out = OUTPUT_BUFFER_SIZE;
-  
+
     result = deflate( &stream, 0 );
   }
 }
@@ -98,7 +99,7 @@ static void zlib_deflate_finish( z_stream_s& stream, indri::file::SequentialWrit
     }
 
     int result = deflate( &stream, Z_FINISH );
-    
+
     if( result == Z_STREAM_END )
       break;
 
@@ -119,6 +120,12 @@ static void zlib_read_document( z_stream_s& stream, indri::file::File& infile, U
   // split up the data as necessary
   // decompress positional info
 
+/*
+  std::cout << "zlib_read_document";
+  std::cout << "\t offset = " << offset;
+  std::cout << std::endl;
+*/
+
   // read some data
   char inputBuffer[INPUT_BUFFER_SIZE];
   outputBuffer.grow( INPUT_BUFFER_SIZE );
@@ -126,12 +133,19 @@ static void zlib_read_document( z_stream_s& stream, indri::file::File& infile, U
 
   stream.avail_in = 0;
   stream.avail_out = 0;
-  
+
   while(true) {
     if( !stream.avail_in ) {
       UINT64 readSize = infile.read( inputBuffer, offset, sizeof inputBuffer );
-      offset += readSize; 
-      
+      offset += readSize;
+
+/*
+      std::cout << "zlib_read_document";
+      std::cout << "\t readSize = " << readSize;
+      std::cout << "\t offset = " << offset;
+      std::cout << std::endl;
+*/
+
       stream.avail_in = readSize;
       stream.next_in = (Bytef*) inputBuffer;
     }
@@ -144,7 +158,7 @@ static void zlib_read_document( z_stream_s& stream, indri::file::File& infile, U
 
     if( result == Z_STREAM_END ) {
       result = inflate( &stream, Z_FINISH );
-      
+
       if( result < 0 )
         LEMUR_THROW( result, "Something bad happened while trying to finish decompressing a document." );
 
@@ -351,7 +365,7 @@ void indri::collection::CompressedCollection::create( const std::string& fileNam
 
 void indri::collection::CompressedCollection::create( const std::string& fileName, const std::vector<std::string>& forwardIndexedFields, const std::vector<std::string>& reverseIndexedFields, bool storeDocs ) {
   _storeDocs = storeDocs;
-  
+
   std::string manifestName = indri::file::Path::combine( fileName, "manifest" );
   std::string lookupName = indri::file::Path::combine( fileName, "lookup" );
   std::string storageName = indri::file::Path::combine( fileName, "storage" );
@@ -584,7 +598,7 @@ std::vector<std::string> indri::collection::CompressedCollection::reverseFields(
 
 void indri::collection::CompressedCollection::addDocument( lemur::api::DOCID_T documentID, indri::api::ParsedDocument* document ) {
   indri::thread::ScopedLock l( _lock );
-  
+
   _stream->zalloc = zlib_alloc;
   _stream->zfree = zlib_free;
   _stream->next_out = 0;
@@ -594,6 +608,12 @@ void indri::collection::CompressedCollection::addDocument( lemur::api::DOCID_T d
   int keyLength;
   int valueLength;
   int recordOffset = 0;
+
+/*
+  std::cout << "indri::collection::CompressedCollection::addDocument";
+  std::cout << "\t documentID = " << documentID;
+  std::cout << std::endl;
+*/
 
   // compress the document text, metadata, and term positions
   // record the file position of the start point and index it
@@ -656,19 +676,19 @@ void indri::collection::CompressedCollection::addDocument( lemur::api::DOCID_T d
     recordOffsets.push_back( recordOffset );
     recordOffsets.push_back( recordOffset + keyLength );
     recordOffset += (keyLength + valueLength);
-    
+
     // then, write the text out
     _writeText( document, keyLength, valueLength );
     recordOffsets.push_back( recordOffset );
     recordOffsets.push_back( recordOffset + keyLength );
     recordOffset += (keyLength + valueLength);
-    
+
     // then, write the content offset out
     _writeContent( document, keyLength, valueLength );
     recordOffsets.push_back( recordOffset );
     recordOffsets.push_back( recordOffset + keyLength );
     recordOffset += (keyLength + valueLength);
-    
+
     // then, write the content length out
     _writeContentLength( document, keyLength, valueLength );
     recordOffsets.push_back( recordOffset );
@@ -680,7 +700,7 @@ void indri::collection::CompressedCollection::addDocument( lemur::api::DOCID_T d
     _stream->next_in = (Bytef*) &recordOffsets.front();
     _stream->avail_in = recordOffsets.size() * sizeof(UINT32);
     zlib_deflate_finish( *_stream, _output );
-  
+
   // store this data under the document ID
   _lookup.put( documentID, &offset, sizeof offset );
   }
@@ -698,16 +718,52 @@ bool indri::collection::CompressedCollection::exists( lemur::api::DOCID_T docume
 indri::api::ParsedDocument* indri::collection::CompressedCollection::retrieve( lemur::api::DOCID_T documentID ) {
   indri::thread::ScopedLock l( _lock );
 
+/*
+  std::cout << "indri::collection::CompressedCollection::retrieve";
+  std::cout << "\t documentID = " << documentID;
+  std::cout << std::endl;
+*/
+
   UINT64 offset;
   int actual;
-  
+
   if( !_lookup.get( documentID, &offset, actual, sizeof offset ) ) {
     LEMUR_THROW( LEMUR_IO_ERROR, "Unable to find document " + i64_to_string(documentID) + " in the collection." );
   }
 
+/*
+  std::cout << "indri::collection::CompressedCollection::retrieve";
+  std::cout << "\t offset = " << offset;
+  if (_output) {
+    std::cout << "\t _output not null";
+  }
+  std::cout << std::endl;
+*/
+
   // flush output buffer; make sure all data is on disk
-  if( _output )
+  if( _output ) {
     _output->flush();
+
+    /*
+     * POSIX requires that a read(2) which can be proved to occur after a write()
+     * has returned returns the new data.  Note that not all file systems are POSIX conforming.
+     *
+     * hack to update eof for non-POSIX compiant file system  - flush() is insufficient to
+     * retrieve newly indexed document stored in collection (during concurrent index & query operations)
+     *
+     * TODO: this is expensive, explore with other file systems
+     *
+     */
+    std::string storageName = indri::file::Path::combine( _basePath, "storage" );
+    _storage.close(); //Also a layer violation, as _output still tied to _storage (and not thread safe)
+    _storage.open( storageName );
+  }
+
+/*
+  std::cout << "indri::collection::CompressedCollection::retrieve";
+  std::cout << "\t post flush()";
+  std::cout << std::endl;
+*/
 
   // decompress the data
   indri::utility::Buffer output;
@@ -717,8 +773,20 @@ indri::api::ParsedDocument* indri::collection::CompressedCollection::retrieve( l
 
   inflateInit( &stream );
 
+/*
+  std::cout << "indri::collection::CompressedCollection::retrieve";
+  std::cout << "\t reading document";
+  std::cout << std::endl;
+*/
+
   zlib_read_document( stream, _storage, offset, output );
   int decompressedSize = stream.total_out;
+
+/*
+  std::cout << "indri::collection::CompressedCollection::retrieve";
+  std::cout << "\t decompressedSize = " << decompressedSize;
+  std::cout << std::endl;
+*/
 
   // initialize the buffer as a ParsedDocument
   indri::api::ParsedDocument* document = (indri::api::ParsedDocument*) output.front();
@@ -816,14 +884,14 @@ std::string indri::collection::CompressedCollection::retrieveMetadatum( lemur::a
       indri::utility::greedy_vector<indri::parse::MetadataPair>::iterator iter = std::find_if( document->metadata.begin(),
       document->metadata.end(),
       indri::parse::MetadataPair::key_equal( attributeName.c_str() ) );
-    
+
       if( iter != document->metadata.end() ) {
       result = (char*) iter->value;
       }
     */
     indri::utility::greedy_vector<indri::parse::MetadataPair>::iterator iter;
     for( iter=document->metadata.begin(); iter !=  document->metadata.end();
-         iter++ ) 
+         iter++ )
       if(!strcmp((*iter).key, attributeName.c_str() ) )
         result = (char*) iter->value;
     delete document;
@@ -833,7 +901,7 @@ std::string indri::collection::CompressedCollection::retrieveMetadatum( lemur::a
 }
 
 //
-// retrieveIDByMetadatum 
+// retrieveIDByMetadatum
 //
 
 std::vector<lemur::api::DOCID_T> indri::collection::CompressedCollection::retrieveIDByMetadatum( const std::string& attributeName, const std::string& value ) {
@@ -887,7 +955,7 @@ std::vector<indri::api::ParsedDocument*> indri::collection::CompressedCollection
 void indri::collection::CompressedCollection::_removeForwardLookups( indri::index::DeletedDocumentList& deletedList, lemur::file::Keyfile& keyfile ) {
 	indri::index::DeletedDocumentList::read_transaction* transaction = deletedList.getReadTransaction();
 	lemur::api::DOCID_T nextDeletedDocument = 0;
-	
+
   int key;
   int actual = 0;
   indri::utility::Buffer value;
@@ -1053,11 +1121,11 @@ static bool keyfile_get( lemur::file::Keyfile& keyfile, char* key, indri::utilit
 void indri::collection::CompressedCollection::_removeReverseLookups( indri::index::DeletedDocumentList& deletedList, lemur::file::Keyfile& keyfile ) {
 	indri::index::DeletedDocumentList::read_transaction* transaction = deletedList.getReadTransaction();
 	lemur::api::DOCID_T nextDeletedDocument = 0;
-  
+
   char key[lemur::file::Keyfile::MAX_KEY_LENGTH+1];
   indri::utility::Buffer value;
   value.grow();
-  
+
   keyfile.setFirst();
 
   while( keyfile_next( keyfile, key, sizeof key, value ) ) {
@@ -1072,12 +1140,12 @@ void indri::collection::CompressedCollection::_removeReverseLookups( indri::inde
       if( value.position() == 0 ) {
         keyfile.remove( key );
       } else {
-        keyfile.put( key, value.front(), (int)value.position() ); 
+        keyfile.put( key, value.front(), (int)value.position() );
       }
       keyfile.getSize( key );
     }
   }
-	
+
 	delete transaction;
 }
 
@@ -1089,7 +1157,7 @@ void indri::collection::CompressedCollection::_copyStorageEntry( indri::file::Se
                                                                  indri::file::SequentialWriteBuffer* output,
                                                                  int key,
                                                                  UINT64 position,
-                                                                 UINT64 length, 
+                                                                 UINT64 length,
                                                                  lemur::file::Keyfile& lookup ) {
   // store the location of the new file
   UINT64 outputPosition = output->tell();
@@ -1211,7 +1279,7 @@ void indri::collection::CompressedCollection::compact( indri::index::DeletedDocu
 // append
 //
 // Starts with another open compressed collection, a deleted document list,
-// and a base document number.  
+// and a base document number.
 //
 
 void indri::collection::CompressedCollection::append( indri::collection::CompressedCollection& other, indri::index::DeletedDocumentList& deletedList, lemur::api::DOCID_T documentOffset ) {
@@ -1268,7 +1336,7 @@ void indri::collection::CompressedCollection::_copyForwardLookup( const std::str
 
 	indri::index::DeletedDocumentList::read_transaction* transaction = deletedList.getReadTransaction();
   lemur::file::Keyfile& local = **found;
-  
+
   int key = 0;
   indri::utility::Buffer value;
   value.grow();
@@ -1295,7 +1363,7 @@ void indri::collection::CompressedCollection::_copyReverseLookup( const std::str
   char key[lemur::file::Keyfile::MAX_KEY_LENGTH+1];
   // find reverse lookup in local collection, if not found, throw an exception
   lemur::file::Keyfile** found;
-  
+
   found = _reverseLookups.find( name.c_str() );
 
   if( !found )

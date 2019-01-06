@@ -7,7 +7,7 @@
 // interfaces.
 //
 // 17 July 2006 -- tds
-//            
+//
 
 #include "indri/SnippetBuilder.hpp"
 #include <algorithm>
@@ -18,9 +18,23 @@
 //
 
 void indri::api::SnippetBuilder::_getRawNodes( std::vector<std::string>& nodeNames, const indri::api::QueryAnnotationNode* node ) {
+
   if( node->type == "RawScorerNode" ) {
+
+    /*
+     *
+    std::cout << "indri::api::SnippetBuilder::_getRawNodes" << std::endl;
+    std::cout << "\t node->name = " << node->name;
+    std::cout << ", node->type = " << node->type;
+    std::cout << ", node->queryText = " << node->queryText << std::endl;
+     *
+     */
+
     nodeNames.push_back( node->name );
   } else {
+
+    //std::cout << "\t node->children.size() = " << node->children.size() << std::endl;
+
     for( size_t i=0; i<node->children.size(); i++ ) {
       _getRawNodes( nodeNames, node->children[i] );
     }
@@ -50,36 +64,51 @@ bool sort_regions( const indri::api::SnippetBuilder::Region& one,
 // _documentMatches
 //
 
-std::vector< std::pair<indri::index::Extent, int> > indri::api::SnippetBuilder::_documentMatches( int document, 
+std::vector< std::pair<indri::index::Extent, int> > indri::api::SnippetBuilder::_documentMatches( int document,
                                                             const std::map< std::string,
                                                             std::vector<indri::api::ScoredExtentResult> >& annotations,
                                                             const std::vector<std::string>& nodeNames ) {
   std::vector< std::pair<indri::index::Extent, int> > extents;
-  
+
+  //std::cout << "indri::api::SnippetBuilder::_documentMatches" << std::endl;
+  //std::cout << "\t nodeNames.size() = " << nodeNames.size() << std::endl;
+
   for( size_t i=0; i<nodeNames.size(); i++ ) {
     std::map< std::string, std::vector<indri::api::ScoredExtentResult> >::const_iterator iter;
     const std::string& nodeName = nodeNames[i];
-    
+
+    //std::cout << "\t\t nodeNames[" << i << "] = " << nodeName;
+
     // are there annotations for this node?  if not, keep going
     iter = annotations.find( nodeName );
     if( iter == annotations.end() ) {
+
+      //std::cout << ", no annotations for this node." << std::endl;
+
       continue;
     }
-    
+
     // there are annotations, so get just the ones for this document
     const std::vector<indri::api::ScoredExtentResult>& matches = iter->second;
+
+    //std::cout << ", matches.size() = " << matches.size() << std::endl;
+
     for( size_t j=0; j<matches.size(); j++ ) {
+
+      //std::cout << "\t\t\t matches[" << j << "].document = " << matches[j].document;
+      //std::cout << ", matches[" << j << "].begin = " << matches[j].begin;
+      //std::cout << ", matches[" << j << "].end = " << matches[j].end << std::endl;
 
       if( matches[j].document == document ) {
         indri::index::Extent e;
         e.begin = matches[j].begin;
         e.end = matches[j].end;
-        
+
         extents.push_back( std::make_pair( e, i ) );
       }
     }
   }
-  
+
   // now we have some extents; we'll sort them by start position
   std::sort( extents.begin(), extents.end(), sort_extent_pairs );
   return extents;
@@ -167,8 +196,8 @@ std::vector<indri::api::SnippetBuilder::Region> indri::api::SnippetBuilder::_bui
 {
   std::vector<indri::api::SnippetBuilder::Region> regions;
   int wordCount = 0;
-  
-  if( extents.size() == 0 ) 
+
+  if( extents.size() == 0 )
     return regions;
 
   std::vector<Region> matchRegions;
@@ -204,20 +233,20 @@ std::vector<indri::api::SnippetBuilder::Region> indri::api::SnippetBuilder::_bui
 char* indri::api::SnippetBuilder::_sanitizeText( const char* text, int begin, int length ) {
   char* result = (char*) malloc( length+1 );
   memset( result, 0, length+1 );
-  
+
   bool wasSpace = false;
   int end = begin+length;
   int j=0;
-  
+
   for( int i=begin; i<end; i++ ) {
     char c = text[i];
-    
+
     if( c == '<' ) {
       i++;
 
       // skip past any whitespace
       i += strspn( text + i, " \t\n\r" );
-      
+
       if( !::strncmp( "!--", text + i, 3 ) ) {
         // in comment, search for end of it:
         i += 3;
@@ -233,7 +262,7 @@ char* indri::api::SnippetBuilder::_sanitizeText( const char* text, int begin, in
           endp = strchr( endp, '>' );
         if( endp )
           i = endp - text;
-        else 
+        else
           i = end;
       } else if( i < length-6 && !lemur_compat::strncasecmp( "script", text + i, 6 ) ) {
         // script tag
@@ -263,7 +292,7 @@ char* indri::api::SnippetBuilder::_sanitizeText( const char* text, int begin, in
       wasSpace = false;
     }
   }
-  
+
   result[j] = 0;
   return result;
 }
@@ -291,11 +320,11 @@ void indri::api::SnippetBuilder::_addHighlightedRegion( std::string& snippet, ch
 //
 
 void indri::api::SnippetBuilder::_addUnhighlightedRegion( std::string& snippet, char* region ) {
-  if( _HTMLOutput ) 
+  if( _HTMLOutput )
     snippet += region;
   else
     snippet += region;
-  
+
   free(region);
 }
 
@@ -317,7 +346,7 @@ void indri::api::SnippetBuilder::_addEllipsis( std::string& snippet ) {
 void indri::api::SnippetBuilder::_completeSnippet( std::string& snippet ) {
   if( _HTMLOutput )
     return;
-  
+
   size_t i = 0;
 
   // add linebreaks
@@ -335,66 +364,233 @@ void indri::api::SnippetBuilder::_completeSnippet( std::string& snippet ) {
 //
 
 std::string indri::api::SnippetBuilder::build( int documentID, const indri::api::ParsedDocument* document, indri::api::QueryAnnotation* annotation ) {
-  // put together the match information we'll need later 
+  // put together the match information we'll need later
   int windowSize = 50;
   const char* text = document->text;
   std::vector<std::string> nodeNames;
   _getRawNodes( nodeNames, annotation->getQueryTree() );
   std::vector< std::pair<indri::index::Extent, int> > extents = _documentMatches( documentID, annotation->getAnnotations(), nodeNames );
-  
+
+  /*
+   *
+  std::cout << "indri::api::SnippetBuilder::build" << std::endl;
+  std::cout << "\t document->positions.size() = " << document->positions.size() << std::endl;
+  std::string docText;
+  int bb;
+  int eb;
+  int len;
+  for(size_t i=0; i<document->positions.size(); i++ ) {
+    bb = document->positions[i].begin;
+    eb = document->positions[i].end;
+    len = eb - bb;
+    docText += _sanitizeText( text, bb, len );
+    std::cout << "\t\t docText = " << docText << std::endl;
+  }
+  std::cout << "\t nodeNames.size() = " << nodeNames.size() << std::endl;
+  std::cout << "\t extents.size() = " << extents.size() << std::endl;
+  for(size_t i=0; i<nodeNames.size(); i++ ) {
+    std::cout << "\t\t nodeNames[ " << i << " ] = " << nodeNames[i] << std::endl;
+  }
+  for(size_t i=0; i<extents.size(); i++ ) {
+    std::cout << "\t\t extents[ " << i << " ].first.begin = " << extents[i].first.begin;
+    std::cout << ", extents[ " << i << " ].first.end = " << extents[i].first.end;
+    std::cout << ", extents[ " << i << " ].second = " << extents[i].second << std::endl;
+  }
+   *
+   */
+
   if( extents.size() == 0 )
     return std::string();
-  
+
   // calculate the context width for a single match
   int matchWidth = windowSize /(int) extents.size();
   matchWidth = std::max( 15, std::min<int>( 30, extents.size() ) );
-  
+
   // first, we compute a list of regions
   std::vector<indri::api::SnippetBuilder::Region> regions;
   regions = _buildRegions( extents, document->positions.size(), matchWidth, windowSize );
-    
+
+  /*
+   *
+  std::cout << "\t regions.size() = " << regions.size() << std::endl;
+  std::cout << "\t windowSize = " << windowSize << std::endl;
+  std::cout << "\t matchWidth = " << matchWidth << std::endl;
+   */
+
   // now, we have to put all of these regions together into a snippet
   std::string snippet;
   int wordCount = 0;
-  
+
   for( size_t i=0; i<regions.size() && windowSize > wordCount; i++ ) {
     Region& region = regions[i];
-    
+
     if( region.begin != 0 && i == 0 ) {
       _addEllipsis( snippet );
     }
-	
+
 	  if( region.end > (int)document->positions.size() )
 	    continue;
-    
+
     int beginByte = document->positions[region.begin].begin;
     int endByte = document->positions[region.end-1].end;
     int current = beginByte;
     wordCount += region.end - region.begin;
-    
+
+
+    /*
+     *
+    std::cout << "\t region = " << i << std::endl;
+    std::cout << "\t\t region.begin = " << region.begin;
+    std::cout << ", region.end = " << region.end << std::endl;
+    std::cout << "\t\t beginByte = " << beginByte;
+    std::cout << ", endByte = " << endByte;
+    std::cout << ", wordCount = " << wordCount << std::endl;
+    std::cout << "\t\t region.extents.size() = " << region.extents.size() << std::endl;
+     */
+
+
     for( size_t j=0; j<region.extents.size(); j++ ) {
       int regionBegin = region.extents[j].begin;
       int regionEnd = region.extents[j].end;
-	  
+
 	  if( regionEnd > (int)document->positions.size() )
 		continue;
-      
+
       int beginMatch = document->positions[regionBegin].begin;
       int endMatch = document->positions[regionEnd-1].end;
-      
+
+
+      /*
+       *
+      std::cout << "\t\t\t region extent = " << j << std::endl;
+      std::cout << "\t\t\t\t regionBegin = " << regionBegin;
+      std::cout << ", regionEnd = " << regionEnd << std::endl;
+      std::cout << "\t\t\t\t beginMatch = " << beginMatch;
+      std::cout << ", endMatch = " << endMatch << std::endl;
+       */
+
+
       _addUnhighlightedRegion( snippet, _sanitizeText( text, current, beginMatch - current ) );
       _addHighlightedRegion( snippet, _sanitizeText( text, beginMatch, endMatch - beginMatch ) );
-      
+
       current = endMatch;
     }
-    
+
     _addUnhighlightedRegion( snippet, _sanitizeText( text, current, endByte - current ) );
-    
+
     if( region.end != document->positions.size()-1 )
       _addEllipsis( snippet );
   }
 
   _completeSnippet( snippet );
   return snippet;
-}                         
+}
 
+//
+// buildField
+//
+
+std::vector< std::pair< std::string, std::string > >* indri::api::SnippetBuilder::buildField( int documentID, const indri::api::ParsedDocument* document, indri::api::QueryAnnotation* annotation, std::vector< std::string > fields ) {
+  // put together the match information we'll need later
+  int windowSize = 50;
+  const char* text = document->text;
+  std::vector<std::string> nodeNames;
+  _getRawNodes( nodeNames, annotation->getQueryTree() );
+  std::vector< std::pair<indri::index::Extent, int> > extents = _documentMatches( documentID, annotation->getAnnotations(), nodeNames );
+
+  int beginByte;
+  int endByte;
+  size_t len;
+  std::string snippet;
+  std::string str;
+  std::stringstream ss;
+
+  for(size_t i=0; i<extents.size(); i++ ) {
+
+    beginByte = document->positions[extents[i].first.begin].begin;
+    endByte = document->positions[extents[i].first.end-1].end;
+    len = endByte - beginByte;
+
+
+    char* s = (char*) malloc( len+1 );
+    memset( s, 0, len+1 );
+    strncpy( s, &text[beginByte], len );
+
+    //str.resize( len );
+    //str.clear();
+    //strncpy( str.c_str(), ch, len );
+
+    ss << "   extent = " << i << ", nodeName = " << nodeNames[extents[i].second] << ", text = " << s << std::endl;
+    free( s );
+  }
+  snippet = ss.str();
+
+  std::cout << "indri::api::SnippetBuilder::buildField" << std::endl;
+  std::cout << " document = " << documentID << std::endl;
+  std::cout << snippet;
+  /*
+   *
+   *
+   */
+
+
+
+
+  int bb;
+  int eb;
+  //int len;
+  int docLen;
+  std::vector< std::pair< std::string, std::string > >* fds = new std::vector< std::pair< std::string, std::string > >;
+
+  /*
+   *
+  std::cout << "indri::api::SnippetBuilder::buildField" << std::endl;
+  std::cout << "\t document->terms.size() = " << document->terms.size() << std::endl;
+  std::cout << "\t document->tags.size() = " << document->tags.size() << std::endl;
+  std::cout << "\t document->metadata.size() = " << document->metadata.size() << std::endl;
+  std::cout << "\t document->positions.size() = " << document->positions.size() << std::endl;
+  //
+  // text and content seem to be the same for html fce
+  //std::cout << "\t document->text = " << std::string( document->text, document->textLength ) << std::endl;
+  std::cout << "\t document->content = " << std::string( document->content, document->contentLength )  << std::endl;
+
+  std::string docText;
+  std::string unsText;
+  docLen = 0;
+  for(size_t i=0; i<document->positions.size(); i++ ) {
+    bb = document->positions[i].begin;  char* s = (char*) malloc( docLen+1 );
+  memset( s, 0, docLen+1 );
+  bb = document->positions[0].begin;
+  strncpy( s, &text[bb], docLen );
+
+    eb = document->positions[i].end;
+    len = eb - bb;
+    docLen += len;
+    docText += _sanitizeText( text, bb, len );
+  }
+  unsText.resize( docLen );
+  unsText.clear();
+
+  char* s = (char*) malloc( docLen+1 );
+  memset( s, 0, docLen+1 );
+  bb = document->positions[0].begin;
+  strncpy( s, &text[bb], docLen );
+
+  unsText = s;
+   *
+   */
+
+  /*
+   *
+  std::cout << "\t\t docText = " << docText << std::endl;
+  std::cout << "\t\t unsText = " << unsText << std::endl;
+
+  std::string k = fields[0];
+  std::string v = unsText;
+  (*fds).push_back( std::make_pair( k, v ) );
+   *
+   */
+
+  return fds;
+
+}

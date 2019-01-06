@@ -81,7 +81,7 @@ namespace indri
         assert( length <= _position );
         _position -= length;
       }
-  
+
       void grow( size_t newSize ) {
         if( newSize > _size ) {
           if( newSize < 1024*1024 ) {
@@ -97,6 +97,7 @@ namespace indri
 
           char* newBuffer = (char*) malloc( newSize );
           memcpy( newBuffer, _buffer, _position );
+          assert( _buffer != 0 );
           free( _buffer );
           _buffer = newBuffer;
           _size = newSize;

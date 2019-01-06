@@ -60,7 +60,7 @@ void indri::thread::UtilityThread::run() {
 
     deinitialize();
   } catch( lemur::api::Exception& e ) {
-    std::cout << "UtilityThread exiting from exception " << e.what() << std::endl;
+    std::cerr << "UtilityThread exiting from exception " << e.what() << std::endl;
   }
 
 }
@@ -74,7 +74,7 @@ void indri::thread::UtilityThread::start() {
     return;
 
   _runThread = true;
-  _thread = new Thread( utility_thread_run, this ); 
+  _thread = new Thread( utility_thread_run, this );
 }
 
 //
@@ -91,12 +91,9 @@ void indri::thread::UtilityThread::signal() {
 //
 
 void indri::thread::UtilityThread::join() {
-  signal();
-
   if( _thread ) {
     _thread->join();
     delete _thread;
     _thread = 0;
   }
 }
-

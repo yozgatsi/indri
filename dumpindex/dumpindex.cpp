@@ -50,7 +50,7 @@ void print_expression_list( const std::string& indexName, const std::string& exp
   std::vector<indri::api::ScoredExtentResult> result = env.expressionList( expression );
 
 
-  std::cout << expression << " " << env.termCount() << " " 
+  std::cout << expression << " " << env.termCount() << " "
             << env.documentCount() << std::endl;
 
   env.close();
@@ -58,11 +58,11 @@ void print_expression_list( const std::string& indexName, const std::string& exp
   // documentID weight begin end
   for( size_t i=0; i<result.size(); i++ ) {
     std::cout << result[i].document
-              << " " 
+              << " "
               << result[i].score
-              << " " 
+              << " "
               << result[i].begin
-              << " " 
+              << " "
               << result[i].end
               << std::endl;
   }
@@ -83,7 +83,7 @@ void validate( indri::collection::Repository& r ) {
 
   while( !iter->finished() ) {
     indri::index::TermList* list = iter->currentEntry();
-    
+
     if( list->terms().size() != index->documentLength( document ) ) {
       std::cout << "Document " << document << " length mismatch" << std::endl;
     }
@@ -108,7 +108,7 @@ void validate( indri::collection::Repository& r ) {
 }
 
 //
-// Print the whole inverted file.  Each term entry starts with 
+// Print the whole inverted file.  Each term entry starts with
 // a term statistics header (term, termCount, documentCount)
 // followed by indented rows (one per document) of the form:
 // (document, numPositions, pos1, pos2, ... posN ).
@@ -125,7 +125,7 @@ void print_invfile( indri::collection::Repository& r ) {
   while( !iter->finished() ) {
     indri::index::DocListFileIterator::DocListData* entry = iter->currentEntry();
     indri::index::TermData* termData = entry->termData;
- 
+
     entry->iterator->startIteration();
 
     std::cout << termData->term << " "
@@ -150,7 +150,7 @@ void print_invfile( indri::collection::Repository& r ) {
   delete iter;
 }
 
-// 
+//
 // Prints the vocabulary of the index, including term statistics.
 //
 
@@ -192,7 +192,7 @@ void print_field_positions( indri::collection::Repository& r, const std::string&
 
     indri::index::DocExtentListIterator* iter = index->fieldListIterator( fieldString );
     if (iter == NULL) continue;
-    
+
     iter->startIteration();
 
     int doc = 0;
@@ -231,7 +231,7 @@ void print_term_positions( indri::collection::Repository& r, const std::string& 
 
   std::cout << termString << " "
             << stem << " "
-            << termCount << " " 
+            << termCount << " "
             << totalCount << " " << std::endl;
 
   indri::collection::Repository::index_state state = r.indexes();
@@ -242,7 +242,7 @@ void print_term_positions( indri::collection::Repository& r, const std::string& 
 
     indri::index::DocListIterator* iter = index->docListIterator( stem );
     if (iter == NULL) continue;
-    
+
     iter->startIteration();
 
     int doc = 0;
@@ -277,7 +277,7 @@ void print_term_counts( indri::collection::Repository& r, const std::string& ter
 
   std::cout << termString << " "
             << stem << " "
-            << termCount << " " 
+            << termCount << " "
             << totalCount << " " << std::endl;
 
   indri::collection::Repository::index_state state = r.indexes();
@@ -351,9 +351,9 @@ void print_document_data( indri::collection::Repository& r, const char* number )
 
   for( size_t i=0; i<document->tags.size(); i++ ) {
     std::cout << i << " "
-              << document->tags[i]->name << " " 
+              << document->tags[i]->name << " "
               << document->tags[i]->begin << " "
-              << document->tags[i]->end << " " 
+              << document->tags[i]->end << " "
               << document->tags[i]->number << std::endl;
   }
 
@@ -374,15 +374,15 @@ void print_document_vector( indri::collection::Repository& r, const char* number
   documentIDs.push_back(documentID);
 
   indri::server::QueryServerVectorsResponse* response = local.documentVectors( documentIDs );
-  
+
   if( response->getResults().size() ) {
     indri::api::DocumentVector* docVector = response->getResults()[0];
-  
+
     std::cout << "--- Fields ---" << std::endl;
 
     for( size_t i=0; i<docVector->fields().size(); i++ ) {
       const indri::api::DocumentVector::Field& field = docVector->fields()[i];
-      std::cout << field.name << " " << field.begin << " " << field.end << " " << field.number << std::endl;
+      std::cout << field.name << " " << field.begin << " " << field.end << " " << field.number << " " << field.ordinal << " " << field.parentOrdinal << std::endl;
     }
 
     std::cout << "--- Terms ---" << std::endl;
@@ -510,11 +510,11 @@ int main( int argc, char** argv ) {
         REQUIRE_ARGS(4);
         std::string term = argv[3];
         print_term_counts( r, term );
-      } else if( command == "tp" || command == "termpositions" ) { 
+      } else if( command == "tp" || command == "termpositions" ) {
         REQUIRE_ARGS(4);
         std::string term = argv[3];
         print_term_positions( r, term );
-      } else if( command == "fp" || command == "fieldpositions" ) { 
+      } else if( command == "fp" || command == "fieldpositions" ) {
         REQUIRE_ARGS(4);
         std::string field = argv[3];
         print_field_positions( r, field );
@@ -571,5 +571,3 @@ int main( int argc, char** argv ) {
     LEMUR_ABORT(e);
   }
 }
-
-

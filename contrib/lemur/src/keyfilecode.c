@@ -548,6 +548,14 @@ static int unpack0_ptr_and_rec(struct fcb *f, buffer_t *buf, int ix, level0_pntr
     if ( fseeko(file,(FILE_OFFSET)p->sc,0)!=0 ) f->error_code = seek_err;
     else size = fread(rec,(size_t) 1,(size_t) *rec_lc,file);
     if ( size!=(size_t)*rec_lc ) f->error_code = read_err;
+
+    /* since we are returning data rec, and it's coming from disk, and we're */
+    /* dealing with a level0_pntrs, we need to move it into the level0_pntrs */
+    p->segment = max_segment;
+    p->sc = 0;
+    memcpy(p->data_rec,rec,(size_t)*rec_lc);
+    p->lc = *rec_lc;
+    lc = lc + p->lc;
   }
   else {
     p->segment = max_segment;
@@ -1299,7 +1307,7 @@ static void reset_ages(struct fcb *f)
 static int search_hash_chain(struct fcb *f, struct leveln_pntr block)
 {int k,next,bufix=-1/*,cnt=0*/;
 
-  
+
   k =  hash_value(block,f->buffer_pool.buf_hash_entries);
   next = f->buffer_pool.buf_hash_table[k];
   while ( next>=0 ) {
@@ -1523,7 +1531,7 @@ static int vacate_oldest_buffer(struct fcb *f, struct leveln_pntr *b)
       make_buffer_youngest(f,oldest);
       cnt++;
       if ( cnt>f->buffer_pool.buffers_allocated ) {
-        done = true; 
+        done = true;
         set_error1(f,alloc_buf_err,"Couldn't allocate a buffer, allocated=",f->buffer_pool.buffers_allocated);
       }
       else if ( f->buffer_pool.buffer[oldest].lock_cnt>0 ) {
@@ -1637,7 +1645,7 @@ static int find_prefix_lc(struct key *k1, struct key *k2)
 {int i=0,max_lc;
 
   max_lc = k1->lc;
-  if ( k1->lc>k2->lc ) max_lc = k2->lc; 
+  if ( k1->lc>k2->lc ) max_lc = k2->lc;
   if ( max_lc>max_prefix_lc ) max_lc = max_prefix_lc;
   while ( i<max_lc && (k1->text[i]==k2->text[i]) ) i++;
   return(i);
@@ -1888,10 +1896,10 @@ static int search_block(struct fcb *f, int bufix, struct key *k, boolean *found)
         t = k->text + prefix_lc;
         high = b->keys_in_block-1;
 
-        mid = (ix + high) / 2; 
+        mid = (ix + high) / 2;
         while ( ix<=high ) {
           switch ( compare_key(t,(UINT32)klc,b,mid) ) {
-            case cmp_greater: 
+            case cmp_greater:
               ix = mid + 1;
               mid = (ix + high) / 2;
               break;
@@ -2046,7 +2054,7 @@ static void init_key(struct fcb *f, char id[], int lc)
 {int i,j,hash_target,hash_blocks;;
 
   /*  printf("  version=%u, subversion=%d\n",f->version,f->sub_version);*/
-  if ( f->version!=current_version || f->sub_version!=current_sub_version) { 
+  if ( f->version!=current_version || f->sub_version!=current_sub_version) {
     f->error_code = version_err;
     return;
   }
@@ -2396,7 +2404,7 @@ static void delete_keys(struct fcb *f, struct ix_block *b, int ix, int cnt)
     b->prefix_lc = 0;
     b->chars_in_use = 0;
   }
-  
+
   /*if ( f->trace ) {
     fprintf(f->log_file,"**in delete_keys, ix=%d, cnt=%d, b after is\n",ix,cnt);
     print_index_block(f->log_file,f,b);
@@ -2450,7 +2458,7 @@ struct key max; level0_pntr dummy;
   if ( null_pntr(next) && null_pntr(prev) ) { /* only block at this level */
     if ( level==0 && primary_level==0 ) ; /* OK */
     else {
-      set_error1(f,bad_dlt_err,"Singleton block at level=",level); 
+      set_error1(f,bad_dlt_err,"Singleton block at level=",level);
     }
   }
   else if ( null_pntr(prev) ) { /* first block in chain */
@@ -2788,18 +2796,18 @@ static boolean prefix_simple_insert(struct fcb *f, struct ix_block *b, int ix, s
 /*   propagated upward if it replaces the max_key in this (parent) block.   */
 /*   However, if the key replacement causes this block to split then it is  */
 /*   not necessary to propagate further since split_block will update the   */
-/*   parent max_key values.  replace_max_key is similar to         */ 
+/*   parent max_key values.  replace_max_key is similar to         */
 /*   replace_max_key_and_pntr except that it only replaces the key and can  */
 /*   ignore the request if the old and new keys are identical.              */
 
 static void replace_max_key(struct fcb *f, int index, struct key *old_key, struct key *new_key,
   struct leveln_pntr child, unsigned level) {
-  int ix=0,bufix=0; 
-  unsigned new_prefix_lc=0,new_lc=0; 
+  int ix=0,bufix=0;
+  unsigned new_prefix_lc=0,new_lc=0;
   char *name="rep_max_key";
-  boolean found=false,propagate=false; 
-  struct leveln_pntr p=nulln_ptr; 
-  struct key k; 
+  boolean found=false,propagate=false;
+  struct leveln_pntr p=nulln_ptr;
+  struct key k;
   levelx_pntr px,childx;
 
   if ( level>f->primary_level[index] ){
@@ -2826,7 +2834,7 @@ static void replace_max_key(struct fcb *f, int index, struct key *old_key, struc
       if ( ix==f->buffer_pool.buffer[bufix].b.keys_in_block && null_pntr(f->buffer_pool.buffer[bufix].b.next) ) {/* ok */}
       else {
         set_error(f,ix_struct_err,"Couldn't find entry in replace_max_key");
-        if ( log_errors ) {  
+        if ( log_errors ) {
           fprintf(f->log_file,"  No entry in replace_max_key, index=%d, found=%d, level=%u\n",
             index,found,level);
           print_key(f->log_file,index,old_key,"  old key=");
@@ -3218,7 +3226,7 @@ struct key min_key,max_key;
 static boolean move_keys_to_left(struct fcb *f, struct ix_block *lt, struct ix_block *mid, int cnt,
   struct key *new_key, levelx_pntr *new_p, int ix, boolean insert, boolean new_key_in_mid)
 {int i,err=0,next=0,delete_cnt=0,new_ix; unsigned mid_lc,lt_prefix_lc,mid_prefix_lc;
-boolean ok=true,moved_new_key=false; struct key k; levelx_pntr p; 
+boolean ok=true,moved_new_key=false; struct key k; levelx_pntr p;
 
 /*struct ix_block temp_lt,temp_mid;
   temp_lt = *lt;
@@ -3226,7 +3234,7 @@ boolean ok=true,moved_new_key=false; struct key k; levelx_pntr p;
 
     lt_prefix_lc = set_lt_prefix_lc(f,lt,mid,cnt,mid->keys_in_block,new_key,ix,insert);
     if ( f->trace ) fprintf(f->log_file,"  moving %d keys_to_left, orig key_cnts=%d/%d, lt_prefix_lc=%d\n",cnt,
-      lt->keys_in_block,mid->keys_in_block,lt_prefix_lc); 
+      lt->keys_in_block,mid->keys_in_block,lt_prefix_lc);
     if ( lt->keys_in_block==0 ) {
       if ( ix==0 ) set_empty_block_prefix(lt,new_key,lt_prefix_lc);
       else {
@@ -3258,7 +3266,7 @@ boolean ok=true,moved_new_key=false; struct key k; levelx_pntr p;
         ok = ok && simple_insert(f,lt,lt->keys_in_block,new_key,new_p);
         next++;
       }
-      else { 
+      else {
         get_nth_key_and_pntr(f,mid,&k,next-insert,&p);
         delete_cnt++;
         ok = ok && simple_insert(f,lt,lt->keys_in_block,&k,&p);
@@ -3361,7 +3369,7 @@ struct key k; levelx_pntr p;
 
 /* lc_if_move_right returns the key and prefix lengths of rt that  */
 /*   would result if move_cnt keys were moved from lt to rt.  It    */
-/*   also returns the max_key in rt to be used to set the prefix.   */ 
+/*   also returns the max_key in rt to be used to set the prefix.   */
 
 static int lc_if_move_right(struct fcb *f, struct ix_block *lt, struct ix_block *rt, int cnt,
   struct key *k, levelx_pntr *p, int ix, boolean insert,
@@ -3407,7 +3415,7 @@ static int lc_if_move_right(struct fcb *f, struct ix_block *lt, struct ix_block 
 /* lc_if_move_left returns the keys and prefix lengths that would */
 /*   result if move_cnt keys were moved from rt to lt.  It is      */
 /*   similar to lc_if_move_right except that it assumes that rt   */
-/*   contains rt_cnt<=rt->keys_in_block keys.                      */ 
+/*   contains rt_cnt<=rt->keys_in_block keys.                      */
 
 static int lc_if_move_left(struct fcb *f, struct ix_block *lt, struct ix_block *rt,
 int move_cnt, int rt_cnt, struct key *k, levelx_pntr *p, int ix, boolean insert,
@@ -3544,7 +3552,7 @@ static void print_shuffle_candidate(FILE *list,char caption[], struct shuffle_ca
     c->lt_move_cnt,c->rt_move_cnt,
     c->lt_lc,c->lt_prefix_lc,c->mid_lc,c->mid_prefix_lc,c->rt_lc,c->rt_prefix_lc,
     c->lt_lc+c->mid_lc+c->rt_lc,distance_from_min(c));
-} 
+}
 
 /* find_shuffle_candidates checks to see if it is possible to move */
 /*   keys out of mid into rt or lt and returns a list of plausible */
@@ -3653,7 +3661,7 @@ unsigned lt_lc=0,mid_lc=0,rt_lc=0,lt_prefix_lc,mid_prefix_lc,rt_prefix_lc;
         lt_lc = lc_if_move_left(f,lt,mid,lt_cnt,mid_keys,k,new_p,ix,insert,
           &moved_key_left,&lt_prefix_lc,&lt_max);
         mid_lc = chars_after_move(f,mid,lt_cnt,rt_cnt,k,new_p,ix,insert,true,&mid_prefix_lc);
-        if ( feasible_move(lt_lc,mid_lc,rt_lc) ) { 
+        if ( feasible_move(lt_lc,mid_lc,rt_lc) ) {
 	  add_candidate_move(candidates,&candidate_cnt,lt_cnt,rt_cnt,lt_lc,lt_prefix_lc,
             mid_lc,mid_prefix_lc,rt_lc,rt_prefix_lc);
         }
@@ -4034,15 +4042,15 @@ struct key rt_max; boolean moved_new_key,done=false,use_last=false;
 
     if ( (last_left_lc+last_right_lc)==(left_lc+right_lc) ) {
       if ( abs(last_right_lc-last_left_lc)<abs(right_lc-left_lc) ) use_last = true;
-    } 
-    else if ( (last_left_lc+last_right_lc)<(left_lc+right_lc) ) use_last = true; 
+    }
+    else if ( (last_left_lc+last_right_lc)<(left_lc+right_lc) ) use_last = true;
     if ( use_last ) {
       move_rt_cnt = move_rt_cnt - up_or_down;
       left_lc = last_left_lc;
       left_prefix_lc = last_left_prefix_lc;
       right_lc = last_right_lc;
       right_prefix_lc = last_right_prefix_lc;
-    } 
+    }
   }
 
   if ( f->trace ) {
@@ -4165,7 +4173,7 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr *p, int bufix,
       }
     }
   }
-  
+
   /*now propogate upward*/
   if ( new_on_right ) {
     leftb = oldb;
@@ -4223,7 +4231,7 @@ static void split_block(struct fcb *f, struct key *k, levelx_pntr *p, int bufix,
 /* update_index1 inserts key k and pointer p into entry ix in the  */
 /*   index block in buffer[bufix].  It assumes that the buffer has */
 /*   been marked modified, locked and will be unlocked upon        */
-/*   return              */  
+/*   return              */
 
 static void update_index1(struct fcb *f, struct key *k, levelx_pntr *p, int bufix, int ix, boolean insert)
 {int index_type,update_type;
@@ -4434,6 +4442,9 @@ boolean found=false,seq=false;
 
     if ( found ) {
       extract_next(f,index,bufix,t1,&lc,0,p,rec,rec_lc,max_rec_lc);
+      if ( f->error_code==ateof_err ) {
+        f->error_code = getnokey_err; *p = null0_ptr;
+      }
     }
     else if ( f->error_code==no_err ) {
       f->error_code = getnokey_err; *p = null0_ptr;
@@ -4516,7 +4527,7 @@ static int kf_put_rec(struct fcb *f,int index, unsigned char t[], unsigned key_l
         have_space = allocate_rec(f,rlc,&p);
       }
       if ( have_space ) {
-        insert_rec(f,r,&p); 
+        insert_rec(f,r,&p);
         px.p0 = p;
 	update_index1(f,&k,&px,bufix,ix,!found);
         kf_set_bof(f,index);
@@ -4946,7 +4957,7 @@ int kf7_set_eof(struct fcb *f)
 }
 
 int kf7_open_key(struct fcb *f, char id[], int lc, int read_only)
-{  
+{
   /*  read_fib(f,id,false,read_only);*/
   read_fib(f,id,machine_is_little_endian(),read_only);
   if ( f->error_code!=no_err ) set_error(f,badopen_err,"");
@@ -5126,21 +5137,21 @@ int kf7_delete_rec(struct fcb *f, unsigned char key[], unsigned key_lc)
 /* Functions to support subrecords: */
 
 /* Function: get_subrec
-   Retrieve a part of a record.  This is provided for those cases where the 
+   Retrieve a part of a record.  This is provided for those cases where the
    records are so large they must be read into memory from the disk in smaller
-   pieces.  Use get_ptr to get the keyfile_pointer, then call get_subrec 
-   repeatedly with bytes_to_read set to some manageable size and incrementing 
-   offset by bytes_actually_read each time until p->lc bytes have been read.  
-   (You must keep track of offset and bytes_to_read so that you don't ask for 
+   pieces.  Use get_ptr to get the keyfile_pointer, then call get_subrec
+   repeatedly with bytes_to_read set to some manageable size and incrementing
+   offset by bytes_actually_read each time until p->lc bytes have been read.
+   (You must keep track of offset and bytes_to_read so that you don't ask for
    too much.)
 
    Returns no_err if all went well, else a non-zero err code.
 */
 
 int kf7_get_subrec(
-   struct fcb *f, 
+   struct fcb *f,
    level0_pntr *p,      // IN - the original pointer from get_ptr
-   int offset,                 // IN - offset of data to get within the rec 
+   int offset,                 // IN - offset of data to get within the rec
    int bytes_to_read,          // IN - how many bytes of the rec to get
    unsigned char *rec,         // IN-OUT - where to put the bytes from the rec
    int *bytes_actually_read,   // OUT - how many bytes were actually transferred
@@ -5255,7 +5266,7 @@ int open_key(struct fcb *f, char id[], int lc, int read_only)
   else if ( version<=6 ) err = kf6_open_key(f,id,lc,read_only);
   else                   err = version_err;
   return(err);
-  
+
 }
 
 int close_key(struct fcb *f)
@@ -5388,9 +5399,9 @@ int delete_rec(struct fcb *f, char key[], int key_lc)
 }
 
 int get_subrec(
-   struct fcb *f, 
+   struct fcb *f,
    level0_pntr *p,      // IN - the original pointer from get_ptr
-   int offset,                 // IN - offset of data to get within the rec 
+   int offset,                 // IN - offset of data to get within the rec
    int bytes_to_read,          // IN - how many bytes of the rec to get
    unsigned char *rec,         // IN-OUT - where to put the bytes from the rec
    int *bytes_actually_read,   // OUT - how many bytes were actually transferred
@@ -5402,5 +5413,3 @@ int get_subrec(
   else                     err = version_err;
   return(err);
 }
-
-

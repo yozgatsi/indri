@@ -7,7 +7,7 @@
 // interfaces.
 //
 // 17 July 2006 -- tds
-//            
+//
 
 #ifndef INDRI_SNIPPETBUILDER_HPP
 #define INDRI_SNIPPETBUILDER_HPP
@@ -22,22 +22,22 @@ namespace indri {
     class SnippetBuilder {
     private:
       bool _HTMLOutput;
-      
+
     public:
       struct Region {
         int begin;
         int end;
-        
+
         std::vector<indri::index::Extent> extents;
       };
 
-    private:  
+    private:
       void _getRawNodes( std::vector<std::string>& nodeNames, const indri::api::QueryAnnotationNode* node );
-     
-      std::vector< std::pair<indri::index::Extent, int> > _documentMatches( int document, 
+
+      std::vector< std::pair<indri::index::Extent, int> > _documentMatches( int document,
                                                                             const std::map< std::string, std::vector<indri::api::ScoredExtentResult> >& annotations,
                                                                             const std::vector<std::string>& nodeNames );
-      
+
       std::vector<Region> _buildRegions(
                                         std::vector< std::pair<indri::index::Extent, int> >& extents,
                                         int positionCount, int matchWidth, int windowWidth );
@@ -52,10 +52,11 @@ namespace indri {
       void _addHighlightedRegion( std::string& snippet, char* region );
       void _addUnhighlightedRegion( std::string& snippet, char* region );
       void _completeSnippet( std::string& snippet );
-      
-    public:  
+
+    public:
       SnippetBuilder( bool html ) : _HTMLOutput(html) {}
       std::string build( int documentID, const indri::api::ParsedDocument* document, indri::api::QueryAnnotation* annotation );
+      std::vector< std::pair< std::string, std::string > >* buildField( int documentID, const indri::api::ParsedDocument* document, indri::api::QueryAnnotation* annotation, std::vector< std::string > fds );
     };
   }
 }

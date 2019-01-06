@@ -60,9 +60,9 @@ indri::index::DeletedDocumentList::read_transaction::~read_transaction() {
 void indri::index::DeletedDocumentList::_grow( lemur::api::DOCID_T documentID ) {
   // just set an appropriate number of bytes to zero
   int growBytes = (documentID/8)+1 - _bitmap.position();
-  if( growBytes <= 0 )
+  if( _bitmap.position() > (documentID/8) )
     return;
-  
+
   memset( _bitmap.write( growBytes ), 0, growBytes );
   assert( _bitmap.position() > (documentID/8) );
 }
@@ -199,7 +199,7 @@ void indri::index::DeletedDocumentList::markDeleted( lemur::api::DOCID_T documen
 
 bool indri::index::DeletedDocumentList::isDeleted( lemur::api::DOCID_T documentID ) {
   if ( _deletedCount == 0 ) return false;
-  
+
   indri::thread::ScopedLock l( _readLock );
   if( (lemur::api::DOCID_T)_bitmap.position() < (documentID/8)+1 )
     return false;
@@ -224,11 +224,11 @@ indri::index::DeletedDocumentList::read_transaction* indri::index::DeletedDocume
 
 void indri::index::DeletedDocumentList::_calculateDeletedCount() {
   int bitCount[256];
-  
+
   // set up bit table
   for( int i=0; i<256; i++ ) {
     int bits = 0;
-    
+
     for( int j=0; j<8; j++ ) {
       if( i & (1<<j) )
         bits++;
@@ -259,6 +259,9 @@ void indri::index::DeletedDocumentList::read( const std::string& filename ) {
     LEMUR_THROW( LEMUR_IO_ERROR, "Unable to open file: " + filename );
 
   UINT64 fileSize = file.size();
+
+  indri::thread::ScopedLock l( _writeLock );
+
   _bitmap.clear();
   file.read( _bitmap.write( fileSize ), 0, fileSize );
   file.close();
@@ -280,7 +283,9 @@ void indri::index::DeletedDocumentList::write( const std::string& filename ) {
     if( !file.create( filename ) )
       LEMUR_THROW( LEMUR_IO_ERROR, "Unable to create file: "  + filename );
 
-    file.write( _bitmap.front(), 0, _bitmap.position() );
+   indri::thread::ScopedLock l( _writeLock );
+
+   file.write( _bitmap.front(), 0, _bitmap.position() );
     file.close();
   }
 }

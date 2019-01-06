@@ -79,7 +79,7 @@ void indri::infnet::InferenceNetwork::_moveToDocument( lemur::api::DOCID_T candi
     if( *fiter )
       (*fiter)->nextEntry( candidate );
   }
-    
+
   // prepare all priors
   std::vector<indri::collection::PriorListIterator*>::iterator piter;
   for( piter = _priorIterators.begin(); piter != _priorIterators.end(); piter++ ) {
@@ -92,7 +92,7 @@ void indri::infnet::InferenceNetwork::_moveToDocument( lemur::api::DOCID_T candi
   for( diter = _listIteratorNodes.begin(); diter != _listIteratorNodes.end(); diter++ ) {
     (*diter)->prepare( candidate );
   }
-  
+
 }
 
 //
@@ -105,7 +105,7 @@ void indri::infnet::InferenceNetwork::_indexFinished( indri::index::Index& index
 
   // field iterators
   indri::utility::delete_vector_contents<indri::index::DocExtentListIterator*>( _fieldIterators );
-  
+
   // prior iterators
   indri::utility::delete_vector_contents<indri::collection::PriorListIterator*>( _priorIterators );
 }
@@ -135,7 +135,7 @@ void indri::infnet::InferenceNetwork::_indexChanged( indri::index::Index& index 
 
     _fieldIterators.push_back( iterator );
   }
-  
+
   // prior iterators
   for( size_t i=0; i<_priorNames.size(); i++ ) {
     // TODO: this is wasteful, since the prior is associated with the whole collection,
@@ -181,11 +181,17 @@ void indri::infnet::InferenceNetwork::_indexChanged( indri::index::Index& index 
 
 lemur::api::DOCID_T indri::infnet::InferenceNetwork::_nextCandidateDocument( indri::index::DeletedDocumentList::read_transaction* deleted ) {
   lemur::api::DOCID_T candidate = MAX_INT32; // 64
+  lemur::api::DOCID_T candidateNext;
 
+  //std::cout << "indri::infnet::InferenceNetwork::_nextCandidateDocument" << std::endl;
   for( size_t i=0; i<_complexEvaluators.size(); i++ ) {
-    candidate = lemur_compat::min( candidate, _complexEvaluators[i]->nextCandidateDocument() );
+    candidateNext = _complexEvaluators[i]->nextCandidateDocument(); //don't call method more than once per invocation
+    //std::cout << "\t _complexEvaluators[" << i << "]->nextCandidateDocument() = " << candidateNext << std::endl;
+    //std::cout << "\t _complexEvaluators[" << i << "]->getName() = " << _complexEvaluators[i]->getName() << std::endl;
+    candidate = lemur_compat::min( candidate, candidateNext );
   }
 
+  //std::cout << "\t deleted->nextCandidateDocument( " << candidate << " ) = " << deleted->nextCandidateDocument( candidate ) << std::endl;
   return deleted->nextCandidateDocument( candidate );
 }
 
@@ -275,7 +281,7 @@ void indri::infnet::InferenceNetwork::addComplexEvaluatorNode( indri::infnet::Ev
 }
 
 void indri::infnet::InferenceNetwork::addDocumentStructureHolderNode( indri::infnet::DocumentStructureHolderNode* docStruct ) {
-  _documentStructureHolderNode = docStruct;    
+  _documentStructureHolderNode = docStruct;
 }
 
 const std::vector<indri::infnet::EvaluatorNode*>& indri::infnet::InferenceNetwork::getEvaluators() const {
@@ -283,12 +289,24 @@ const std::vector<indri::infnet::EvaluatorNode*>& indri::infnet::InferenceNetwor
 }
 
 void indri::infnet::InferenceNetwork::_evaluateIndex( indri::index::Index& index ) {
+  indri::index::DeletedDocumentList::read_transaction* deleted = _repository.deletedList().getReadTransaction();
+
+  lemur::api::DOCID_T lastCandidate = MAX_INT32; // 64
+  lemur::api::DOCID_T lowerBound = index.documentBase();
+  lemur::api::DOCID_T upperBound = index.documentMaximum();
+  bool notInIndex;
+
+
+  int scoredDocuments = 0;
+  lemur::api::DOCID_T candidate = 0;
+
   // don't need to do anything unless there are some
   // evaluators in the network that need full evaluation
 
   if( _complexEvaluators.size() ) {
+
     lemur::api::DOCID_T maximumDocument = index.documentMaximum();
-    
+
     if (maximumDocument == index.documentBase()) {
       // empty memory index, nothing to score.
       return;
@@ -305,18 +323,27 @@ void indri::infnet::InferenceNetwork::_evaluateIndex( indri::index::Index& index
       // this asks the whole inference network for the
       // first document that might possibly produce a
       // usable (above the max score threshold) score
-      candidate = _nextCandidateDocument( deleted );
-      if (candidate < index.documentBase()) {
-        std::cerr << candidate << " < index.documentBase()" << std::endl;
-        break;
+      do
+      {
+        candidate = _nextCandidateDocument( deleted );
       }
-      
-      assert( candidate >= index.documentBase() );
+      while( candidate < lowerBound );
+      notInIndex = (index.documentLength( candidate ) == 0);
 
       // if candidate is MAX_INT32, we're done
-      if( candidate == MAX_INT32 || candidate > maximumDocument ) {
+      if( candidate == MAX_INT32 || candidate < lowerBound || candidate >= upperBound || notInIndex ) {
+
+/*
+        std::cout << "indri::infnet::InferenceNetwork::_evaluateIndex done!" << std::endl;
+        std::cout << "\t lowerBound = " << lowerBound;
+        std::cout << ", upperBound = " << upperBound;
+        std::cout << ", candidate  = " << candidate;
+        std::cout << ", notInIndex = " << notInIndex << std::endl;
+*/
+
         break;
       }
+      assert( candidate >= lowerBound );
 
       // move all the doc info lists to this new document
       // in preparation for scoring
@@ -324,18 +351,33 @@ void indri::infnet::InferenceNetwork::_evaluateIndex( indri::index::Index& index
         _moveToDocument( candidate );
       }
 
+/*
+      std::cout << "indri::infnet::InferenceNetwork::_evaluateIndex" << std::endl;
+      std::cout << "\t lowerBound = " << lowerBound;
+      std::cout << ", upperBound = " << upperBound;
+      std::cout << ", candidate  = " << candidate << std::endl;
+*/
+
       // ask all the evaluators to evaluate this document
       _evaluateDocument( index, candidate );
       scoredDocuments++;
 
       // if that was the last document, we can quit now
-      if( candidate+1 > maximumDocument )
+      if( candidate+1 >= upperBound ) {
+
+/*
+        std::cout << "indri::infnet::InferenceNetwork::_evaluateIndex done!" << std::endl;
+        std::cout << "\t candidate+1 = " << candidate+1;
+        std::cout << " >= upperBound = " << upperBound << std::endl;
+*/
+
         break;
+      }
 
       // move all candidate iterators to candidate+1
       _moveToDocument( candidate+1 );
       lastCandidate = candidate+1;
-      assert( candidate >= index.documentBase() );
+      assert( candidate >= lowerBound );
     }
     delete deleted;
   }
@@ -349,9 +391,53 @@ const indri::infnet::InferenceNetwork::MAllResults& indri::infnet::InferenceNetw
   // count this query occurrence
   _repository.countQuery();
 
+/*
+  std::cout << "indri::infnet::InferenceNetwork::evaluate " << std::endl;
+  if (_fieldIterators.size() > 0) {
+    std::cout << "\t _fieldIterators.size() = " << _fieldIterators.size() << std::endl;
+  }
+  if (_docIterators.size() > 0) {
+    std::cout << "\t _docIterators.size() = " << _docIterators.size() << std::endl;
+  }
+  if (_priorIterators.size() > 0) {
+    std::cout << "\t _priorIterators.size() = " << _priorIterators.size() << std::endl;
+  }
+  if (_beliefNodes.size() > 0) {
+    std::cout << "\t _beliefNodes.size() = " << _beliefNodes.size() << std::endl;
+    for (int j=0; j<_beliefNodes.size(); j++) {
+      if (_beliefNodes[j]) {
+        std::cout << "\t\t _beliefNodes[" << j << "]->getName() = " << _beliefNodes[j]->getName() << std::endl;
+        std::cout << std::endl;
+      }
+    }
+  }
+  if (_evaluators.size() > 0) {
+    std::cout << "\t _evaluators.size() = " << _evaluators.size() << std::endl;
+    for (int j=0; j<_evaluators.size(); j++) {
+      if (_evaluators[j]) {
+        std::cout << "\t\t _evaluators[" << j << "]->getName() = " << _evaluators[j]->getName() << std::endl;
+        std::cout << std::endl;
+      }
+    }
+  }
+  if (_complexEvaluators.size() > 0) {
+    std::cout << "\t _complexEvaluators.size() = " << _complexEvaluators.size() << std::endl;
+    for (int j=0; j<_complexEvaluators.size(); j++) {
+      if (_complexEvaluators[j]) {
+        std::cout << "\t\t _complexEvaluators[" << j << "]->getName() = " << _complexEvaluators[j]->getName() << std::endl;
+        std::cout << std::endl;
+      }
+    }
+  }
+  if (_scoreFunctions.size() > 0) {
+    std::cout << "\t _scoreFunctions.size() = " << _scoreFunctions.size() << std::endl;
+  }
+  std::cout << std::endl;
+*/
+
   // fetch the current index state
   indri::collection::Repository::index_state indexes = _repository.indexes();
-  
+
   for( size_t i=0; i<indexes->size(); i++ ) {
     indri::index::Index& index = *(*indexes)[i];
     indri::thread::ScopedLock iterators( index.iteratorLock() );

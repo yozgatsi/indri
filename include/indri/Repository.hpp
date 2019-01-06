@@ -30,14 +30,14 @@
 #include "indri/PriorListIterator.hpp"
 #include <string>
 // 512 -- syslimit can be 1024
-#define MERGE_FILE_LIMIT 768 
+#define MERGE_FILE_LIMIT 768
 namespace indri
 {
   /// document manager and ancillary collection components.
   namespace collection
   {
-    
-    /*! Encapsulates document manager, index, and field indexes. Provides access 
+
+    /*! Encapsulates document manager, index, and field indexes. Provides access
      *  to collection for both IndexEnvironment and QueryEnvironment.
      */
     class Repository {
@@ -74,8 +74,6 @@ namespace indri
       // running flags
       volatile bool _maintenanceRunning;
       volatile bool _loadThreadRunning;
-
-      indri::thread::Mutex _addLock; /// protects addDocument
 
       class CompressedCollection* _collection;
       indri::index::DeletedDocumentList _deletedList;
@@ -118,7 +116,7 @@ namespace indri
       void _incrementLoad();
       void _countDocumentAdd();
       Load _computeLoad( indri::atomic::value_type* loadArray );
-      
+
       void _openPriors( const std::string& path );
       void _closePriors();
 
@@ -144,7 +142,7 @@ namespace indri
 
       // these methods should only be called by the maintenance thread
       /// merge all known indexes together
-      void _merge(); 
+      void _merge();
       /// write the active index to disk
       void _write();
       /// merge together some of the more recent indexes
@@ -177,6 +175,8 @@ namespace indri
       /// delete a document from the repository
       /// @param documentID the internal ID of the document to delete
       void deleteDocument( int documentID );
+      /// check if the repository contains a document and it is not maked as deleted
+      bool documentExists( int documentID );
       /// @return the indexed fields for this collection
       const std::vector<Field>& fields() const;
       /// @return the tags for this collection
@@ -214,7 +214,7 @@ namespace indri
 
       /// Indexes in this repository
       index_state indexes();
-      
+
       /// Return a prior iterator
       indri::collection::PriorListIterator* priorListIterator( const std::string& priorName );
 
@@ -225,8 +225,8 @@ namespace indri
       void write();
 
       /// Merge all internal indexes together
-      void merge(); 
-      
+      void merge();
+
       /// Make an empty repository directory on disk
       static void makeEmpty( const std::string& path );
 
@@ -246,4 +246,3 @@ namespace indri
 }
 
 #endif // INDRI_REPOSITORY_HPP
-

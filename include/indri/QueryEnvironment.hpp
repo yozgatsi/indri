@@ -31,9 +31,31 @@
 #include "lemur/IndexTypes.hpp"
 #include "indri/ReformulateQuery.hpp"
 
-namespace indri 
+namespace indri
 {
+/*
+  namespace lang
+  {
+    class QueryNodeWalker : public indri::lang::Walker {
+    private:
 
+    public:
+      QueryNodeWalker() {}
+
+      void defaultBefore( indri::lang::Node* n ) {
+
+        std::cout << "indri::lang::QueryNodeWalker::defaultBefore()" << std::endl;
+        std::cout << "\t n->nodeName() = " << n->nodeName() << std::endl;
+        std::cout << "\t n->queryText() = " << n->queryText() << std::endl;
+        std::cout << "\t n->typeName() = " << n->typeName() << std::endl;
+      }
+
+      void defaultAfter( indri::lang::Node* n ) {
+      }
+
+    };
+  }
+*/
   namespace api 
   {
     /*! \brief Structure for aggregating a query and its parameters.
@@ -42,7 +64,7 @@ namespace indri
       metadata field retrieval, number of results, starting number of the
       results, and a working set of documents to evaluate the query on.
     */
-    typedef struct QueryRequest 
+    typedef struct QueryRequest
     {
       /*! Snippet generation options.
        */
@@ -70,14 +92,14 @@ namespace indri
 
     /*! encapsulation of a metadata field and its value
      */
-    typedef struct MetadataPair 
+    typedef struct MetadataPair
     {
       /// the metadata field name
       std::string key;
       /// the value of the field
       std::string value;
     } MetadataPair;
-    
+
     /*! \brief Structure for aggregating a query result.
       Provides an aggregate for a query result based an retrieval parameters
       from a QueryRequest. Can include a text snippet, external document id,
@@ -104,10 +126,10 @@ namespace indri
 
     /*! Aggretate of the list of QueryResult elements for a QueryRequest,
       with estimated number of total matches, query parse time, query
-      query execution time, and parsed document processing time 
+      query execution time, and parsed document processing time
       (metadata retrieval and snippet generation).
      */
-    typedef struct QueryResults 
+    typedef struct QueryResults
     {
       /// time to parse the query in milliseconds
       float parseTime;
@@ -120,11 +142,11 @@ namespace indri
       /// the list of QueryResult elements.
       std::vector<QueryResult> results;
     } QueryResults;
-    
-    /*! \brief Principal class for interacting with Indri indexes during retrieval. 
+
+    /*! \brief Principal class for interacting with Indri indexes during retrieval.
       Provides the API for opening one or more Repository servers, either local
       or remote. Provides the API for querying the servers with the Indri
-      query language, and additionally requesting aggregate collection 
+      query language, and additionally requesting aggregate collection
       statistics.
     */
     class QueryEnvironment {
@@ -145,7 +167,7 @@ namespace indri
 
       Parameters _parameters;
       bool _baseline;
-      
+
       void _mergeQueryResults( indri::infnet::InferenceNetwork::MAllResults& results, std::vector<indri::server::QueryServerResponse*>& responses );
       void _copyStatistics( std::vector<indri::lang::RawScorerNode*>& scorerNodes, indri::infnet::InferenceNetwork::MAllResults& statisticsResults );
 
@@ -225,7 +247,7 @@ namespace indri
       /// @param query the query to run
       /// @param resultsRequested maximum number of results to return
       /// @return pointer to QueryAnnotations for the query
-      QueryAnnotation* runAnnotatedQuery( const std::string& query, int resultsRequested, const std::string &queryType = "indri" );  
+      QueryAnnotation* runAnnotatedQuery( const std::string& query, int resultsRequested, const std::string &queryType = "indri" );
 
       /// \brief Run an Indri query language query. @see QueryAnnotation
       /// @param query the query to run
@@ -294,13 +316,13 @@ namespace indri
       /// \brief Return total number of term occurrences within a field.
       /// @param term the term to count
       /// @param field the name of the field
-      /// @return total frequency of this term within this field in the 
+      /// @return total frequency of this term within this field in the
       /// aggregated collection
       INT64 termFieldCount( const std::string& term, const std::string& field );
       /// \brief Return total number of stem occurrences within a field.
       /// @param term the stem to count
       /// @param field the name of the field
-      /// @return total frequency of this stem within this field in the 
+      /// @return total frequency of this stem within this field in the
       /// aggregated collection
       INT64 stemFieldCount( const std::string& term, const std::string& field );
       /// \brief Return the total number of times this expression appears in the collection.
@@ -316,7 +338,7 @@ namespace indri
       /// has the very real possibility of exhausting the memory of the machine.  Use this method
       /// with discretion.
       /// @param expression The expression to evaluate, probably an ordered or unordered window expression
-      std::vector<ScoredExtentResult> expressionList( const std::string& expression, 
+      std::vector<ScoredExtentResult> expressionList( const std::string& expression,
                                                       const std::string& queryType = "indri" );
       /// \brief Return the list of fields.
       /// @return vector of field names.
@@ -338,8 +360,8 @@ namespace indri
       /// @param documentID the document id.
       /// @return length of the document, documentID
       int documentLength(lemur::api::DOCID_T documentID);
-      
-      /// \brief Fetch a document vector for a list of documents. 
+
+      /// \brief Fetch a document vector for a list of documents.
       /// Caller responsible for deleting the Vector.
       /// @param documentIDs the vector of document ids.
       /// @return DocumentVector pointer for the specified document.
@@ -349,15 +371,15 @@ namespace indri
       /// @param maxTerms the maximum number of terms to expand a wildcard
       /// operator argument (default 100).
       void setMaxWildcardTerms(int maxTerms);
-      
+
       /// \brief return the internal query servers.
       /// @return the local and network query servers.
-      const std::vector<indri::server::QueryServer*>& getServers() const { 
+      const std::vector<indri::server::QueryServer*>& getServers() const {
         return _servers;
       }
 
       /// \brief set the query reformulation parameters.
-      /// @param p the Parameters object containing the parameters.    
+      /// @param p the Parameters object containing the parameters.
       void setFormulationParameters(Parameters &p);
 
       /// \brief reformulate a query.
@@ -369,4 +391,3 @@ namespace indri
 }
 
 #endif // INDRI_QUERYENVIRONMENT_HPP
-

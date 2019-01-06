@@ -36,12 +36,12 @@
 #include "indri/FileClassEnvironmentFactory.hpp"
 #include <map>
 #include <set>
-namespace indri 
+namespace indri
 {
   ///indri classes that provide services to applications programmers
-  namespace api 
+  namespace api
   {
-    
+
     struct IndexStatus {
       enum action_code {
         FileOpen,
@@ -58,8 +58,8 @@ namespace indri
       virtual void status( int code, const std::string& documentPath, const std::string& error, int documentsIndexed, int documentsSeen ) {};
     };
 
-    /*! \brief Principal class for interacting with Indri indexes during index 
-      construction. 
+    /*! \brief Principal class for interacting with Indri indexes during index
+      construction.
       Provides the API for opening or creating an index and its
       associated repository, setting indexing and text parsing parameters, and
       adding documents to the repository.
@@ -97,12 +97,12 @@ namespace indri
                                indri::parse::Conflater** conflater,
                                const std::string& extension );
 
-      std::vector<indri::parse::Transformation*> _createAnnotators( const std::string& fileName, 
-                                                                    const std::string& fileClass, 
+      std::vector<indri::parse::Transformation*> _createAnnotators( const std::string& fileName,
+                                                                    const std::string& fileClass,
                                                                     indri::parse::Conflater** conflater);
 
-      ParsedDocument* _applyAnnotators( std::vector<indri::parse::Transformation*>& annotators, 
-                                        ParsedDocument* parsed ); 
+      ParsedDocument* _applyAnnotators( std::vector<indri::parse::Transformation*>& annotators,
+                                        ParsedDocument* parsed );
 
       std::set<std::string> _blackedDocs;
 
@@ -147,7 +147,7 @@ namespace indri
       /// @param index tags that should be forwarded to the index for tag extents
       /// @param metadata tags whose contents should be indexed as metadata
       /// @param conflations tags that should be conflated
-      void addFileClass( const std::string& name, 
+      void addFileClass( const std::string& name,
                          const std::string& iterator,
                          const std::string& parser,
                          const std::string& tokenizer,
@@ -157,7 +157,7 @@ namespace indri
                          const std::vector<std::string>& include,
                          const std::vector<std::string>& exclude,
                          const std::vector<std::string>& index,
-                         const std::vector<std::string>& metadata, 
+                         const std::vector<std::string>& metadata,
                          const std::map<indri::parse::ConflationPattern*,std::string>& conflations );
 
       /// Get a named file class.
@@ -171,7 +171,7 @@ namespace indri
       void addFileClass( const indri::parse::FileClassEnvironmentFactory::Specification &spec ){
         _fileClassFactory.addFileClass(spec);
       }
-  
+
       /// Set names of fields to be indexed.  This call indicates to the index that information about
       /// these fields should be stored in the index so they can be used in queries.  This does not
       /// affect whether or not the text in a particular field is stored in an index.
@@ -179,14 +179,14 @@ namespace indri
       /// @param fieldNames the list of fields.
       void setIndexedFields( const std::vector<std::string>& fieldNames );
 
-      /// Set the numeric property of a field. 
+      /// Set the numeric property of a field.
       /// @param fieldName the field.
       /// @param isNumeric true if the field is a numeric field, false if not.
       /// @param parserName The name of the Transformation to use to compute the numeric value of the field. Repository currently recognizes the name NumericFieldAnnotator.
       void setNumericField( const std::string& fieldName, bool isNumeric,
                             const std::string &parserName = "");
 
-      /// Set the ordinal property of a field. 
+      /// Set the ordinal property of a field.
       /// @param fieldName the field.
       /// @param isOrdinal true if the field is an ordinal field, false if not.
       void setOrdinalField( const std::string& fieldName, bool isOrdinal);
@@ -247,7 +247,7 @@ namespace indri
 
       /// close the index and repository
       void close();
-  
+
       /// Add the text in a file to the index and repository.  The fileClass of this file
       /// will be chosen based on the file extension.  If the file has no extension, it will
       /// be skipped.  Information about indexing progress will be passed to the callback.
@@ -265,8 +265,8 @@ namespace indri
       /// @param documentString the document to add
       /// @param fileClass the file class to add (eg trecweb).
       /// @param metadata the metadata pairs associated with the string.
-      lemur::api::DOCID_T addString( const std::string& documentString, 
-                     const std::string& fileClass, 
+      lemur::api::DOCID_T addString( const std::string& documentString,
+                     const std::string& fileClass,
                      const std::vector<indri::parse::MetadataPair>& metadata );
 
       /// Adds a string to the index and repository.  The documentString is assumed to contain the kind of
@@ -279,11 +279,11 @@ namespace indri
       /// specify byte (not character or token) offsets within the
       /// document string. These byte offsets are converted to token
       /// offsets after document string parsing.
-      lemur::api::DOCID_T addString( const std::string& documentString, 
-                     const std::string& fileClass, 
-                     const std::vector<indri::parse::MetadataPair>& metadata, 
+      lemur::api::DOCID_T addString( const std::string& documentString,
+                     const std::string& fileClass,
+                     const std::vector<indri::parse::MetadataPair>& metadata,
                      const std::vector<indri::parse::TagExtent *> &tags );
-      
+
       /// add an already parsed document to the index and repository
       /// @param document the document to add
       lemur::api::DOCID_T addParsedDocument( ParsedDocument* document );
@@ -291,6 +291,10 @@ namespace indri
       /// Delete an existing document.
       /// @param documentID The document to delete.
       void deleteDocument( lemur::api::DOCID_T documentID );
+
+      /// Check existance of a document.
+      /// @param documentID the internal ID of the document to check
+      bool documentExists(lemur::api::DOCID_T documentID);
 
       /// Returns the number of documents indexed so far in this session.
       int documentsIndexed();
@@ -316,4 +320,3 @@ namespace indri
 }
 
 #endif // INDRI_INDEXENVIRONMENT_HPP
-
