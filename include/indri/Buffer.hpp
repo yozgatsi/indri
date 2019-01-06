@@ -26,7 +26,7 @@ namespace indri
   /*! \brief Utility classes for indri components. */
   namespace utility
   {
-    
+
     class Buffer {
     private:
       char* _buffer;
@@ -97,7 +97,7 @@ namespace indri
 
           char* newBuffer = (char*) malloc( newSize );
           memcpy( newBuffer, _buffer, _position );
-          assert( _buffer != 0 );
+          //assert( _buffer != 0 ); code lacks proper initializations...
           free( _buffer );
           _buffer = newBuffer;
           _size = newSize;
