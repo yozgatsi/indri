@@ -640,17 +640,20 @@ void indri::collection::CompressedCollection::addDocument( lemur::api::DOCID_T d
       try {
         // there may be more than one reverse lookup here, so we fetch any old ones:
         indri::utility::greedy_vector<lemur::api::DOCID_T> documentIDs;
-        int dataSize = (*metalookup)->getSize( (const char*)document->metadata[i].value );
+		int dataSize = (*metalookup)->getSize( (const char*)document->metadata[i].value );
+		int keySize = (*metalookup)->getSize( (const char*)document->metadata[i].key );
 
         if( dataSize >= 0 ) {
           int actual = 0;
 
           documentIDs.resize( dataSize / sizeof(lemur::api::DOCID_T) );
+
           (*metalookup)->get( (const char*)document->metadata[i].value,
                               &documentIDs.front(),
                               actual,
                               dataSize );
-          assert( actual == documentIDs.size() * sizeof(lemur::api::DOCID_T) );
+		  //assert( actual == documentIDs.size() * sizeof(lemur::api::DOCID_T) );
+		  assert( actual == dataSize );
         }
 
         documentIDs.push_back( documentID );
