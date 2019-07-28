@@ -31,17 +31,17 @@ namespace indri {
       VTermEntry::iterator _iterator;
       DiskTermData _diskTermData;
 
-      // this tells us if the last nextEntry() came from 
+      // this tells us if the last nextEntry() came from
       // a start iteration or not - needed for nextEntry(const char*)
       // call
       bool _justStartedIteration;
-      
+
     public:
       MemoryIndexVocabularyIterator( VTermEntry& termData ) :
         _termData(termData)
       {
       }
-      
+
       void startIteration() {
         _iterator = _termData.begin();
 
@@ -55,18 +55,18 @@ namespace indri {
 
         _justStartedIteration=true;
       }
-      
-      DiskTermData* currentEntry() { 
+
+      DiskTermData* currentEntry() {
         if( _iterator == _termData.end() )
           return 0;
-        
+
         return &_diskTermData;
       }
-      
+
       bool nextEntry() {
         if( finished() )
           return false;
-        
+
         _iterator++;
 
         if( finished() )
@@ -95,6 +95,8 @@ namespace indri {
         while (_iterator!=_termData.end()) {
 
           if (strstr((*_iterator)->term, skipTo)==(*_iterator)->term) {
+            _diskTermData.termData = (*_iterator)->termData;
+            _diskTermData.termID = (*_iterator)->termID;
             return true;
           }
           _iterator++;
@@ -112,4 +114,3 @@ namespace indri {
 }
 
 #endif // INDRI_MEMORYINDEXVOCABULARYITERATOR_HPP
-
