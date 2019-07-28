@@ -315,8 +315,6 @@ void indri::infnet::InferenceNetwork::_evaluateIndex( indri::index::Index& index
     lemur::api::DOCID_T lastCandidate = MAX_INT32; // 64
     int scoredDocuments = 0;
     lemur::api::DOCID_T candidate = 0;
-    indri::index::DeletedDocumentList::read_transaction* deleted;
-    deleted = _repository.deletedList().getReadTransaction();
 
     while(1) {
       // ask the root node for a candidate document
@@ -379,8 +377,8 @@ void indri::infnet::InferenceNetwork::_evaluateIndex( indri::index::Index& index
       lastCandidate = candidate+1;
       assert( candidate >= lowerBound );
     }
-    delete deleted;
   }
+  delete deleted;
 }
 
 //
